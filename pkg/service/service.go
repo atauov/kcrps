@@ -1,8 +1,13 @@
 package service
 
-import "dashboard/pkg/repository"
+import (
+	"dashboard"
+	"dashboard/pkg/repository"
+)
 
 type Authorization interface {
+	CreateUser(user dashboard.User) (int, error)
+	GenerateToken(username, password string) (string, error)
 }
 
 type Invoice interface {
@@ -14,5 +19,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repos.Authorization),
+	}
 }
