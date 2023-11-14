@@ -12,6 +12,9 @@ type Authorization interface {
 }
 
 type Invoice interface {
+	Create(userId int, invocie dashboard.Invoice) (int, error)
+	GetAll(userId int) ([]dashboard.Invoice, error)
+	GetById(userId, invoiceId int) (dashboard.Invoice, error)
 }
 
 type Service struct {
@@ -22,5 +25,6 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		Invoice:       NewInvoiceService(repos.Invoice),
 	}
 }
