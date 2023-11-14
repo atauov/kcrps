@@ -14,6 +14,7 @@ type Invoice interface {
 	Create(userId int, invoice dashboard.Invoice) (int, error)
 	GetAll(userId int) ([]dashboard.Invoice, error)
 	GetById(userId, invoiceId int) (dashboard.Invoice, error)
+	Delete(userId, invoiceId int) error
 }
 
 type Repository struct {

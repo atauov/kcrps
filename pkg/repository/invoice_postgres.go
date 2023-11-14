@@ -42,8 +42,8 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 	var invoices []dashboard.Invoice
 
-	query := fmt.Sprintf("SELECT tl.id, tl.amount, tl.account, tl.message FROM %s tl INNER JOIN %s ul on "+
-		"tl.id =ul.invoice_id WHERE ul.user_id = $1", invoicesTable, usersInvoicesTable)
+	query := fmt.Sprintf("SELECT il.id, il.amount, il.account, il.message FROM %s il INNER JOIN %s ul on "+
+		"il.id =ul.invoice_id WHERE ul.user_id = $1", invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
 
 	return invoices, err
@@ -52,9 +52,17 @@ func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, error) {
 	var invoice dashboard.Invoice
 
-	query := fmt.Sprintf("SELECT tl.id, tl.amount, tl.account, tl.message FROM %s tl INNER JOIN %s ul on "+
-		"tl.id =ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2", invoicesTable, usersInvoicesTable)
+	query := fmt.Sprintf("SELECT il.id, il.amount, il.account, il.message FROM %s il INNER JOIN %s ul on "+
+		"il.id =ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2", invoicesTable, usersInvoicesTable)
 	err := r.db.Get(&invoice, query, userId, invoiceId)
 
 	return invoice, err
+}
+
+func (r *InvoicePostgres) Delete(userId, invoiceId int) error {
+	query := fmt.Sprintf("DELETE FROM %s il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+		invoicesTable, usersInvoicesTable)
+	_, err := r.db.Exec(query, userId, invoiceId)
+
+	return err
 }

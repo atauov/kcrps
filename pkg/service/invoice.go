@@ -23,3 +23,7 @@ func (s *InvoiceService) GetAll(userId int) ([]dashboard.Invoice, error) {
 func (s *InvoiceService) GetById(userId, invoiceId int) (dashboard.Invoice, error) {
 	return s.repo.GetById(userId, invoiceId)
 }
+
+func (s *InvoiceService) Delete(userId, invoiceId int) error {
+	return s.repo.Delete(userId, invoiceId)
+}
