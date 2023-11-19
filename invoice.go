@@ -1,8 +1,14 @@
 package dashboard
 
+import "time"
+
 type Invoice struct {
-	Id      int    `json:"id" db:"id"`
-	Amount  int    `json:"amount" db:"amount" binding:"required"`
-	Account string `json:"account" db:"account" binding:"required"`
-	Message string `json:"message" db:"message" binding:"required"`
+	Id         int       `json:"id" db:"id"`
+	UUID       int       `json:"uuid" db:"uuid" binding:"required"`
+	CreatedAt  time.Time `json:"created-at" db:"created_at" binding:"required"`
+	Account    string    `json:"account" db:"account" binding:"required"`
+	Amount     int       `json:"amount" db:"amount" binding:"required"`
+	ClientName string    `json:"client-name" db:"client_name"`
+	Message    string    `json:"message" db:"message" binding:"required"`
+	Status     int       `json:"status" db:"status" binding:"required"`
 }

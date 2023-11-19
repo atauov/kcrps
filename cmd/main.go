@@ -15,6 +15,17 @@ import (
 	"syscall"
 )
 
+// @title kaspi gray API service
+// @version 0.1
+// @description API server for custom remote payment service in kaspi mobile POS
+
+// @host localhost:8089
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 

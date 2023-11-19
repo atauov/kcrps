@@ -4,6 +4,7 @@ import (
 	"dashboard"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 type InvoicePostgres struct {
@@ -21,9 +22,11 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 	}
 
 	var id int
-	createInvoiceQuery := fmt.Sprintf("INSERT INTO %s (amount, account, message) VALUES ($1, $2, $3) RETURNING id",
-		invoicesTable)
-	row := tx.QueryRow(createInvoiceQuery, invoice.Amount, invoice.Account, invoice.Message)
+	createInvoiceQuery := fmt.Sprintf(
+		"INSERT INTO %s (uuid, created_at, account, amount, client_name, message, status)"+
+			"VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id", invoicesTable)
+	row := tx.QueryRow(createInvoiceQuery, invoice.UUID, time.Now(), invoice.Account, invoice.Amount, invoice.ClientName,
+		invoice.Message, invoice.Status)
 	if err = row.Scan(&id); err != nil {
 		tx.Rollback()
 		return 0, err
@@ -42,8 +45,9 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 	var invoices []dashboard.Invoice
 
-	query := fmt.Sprintf("SELECT il.id, il.amount, il.account, il.message FROM %s il INNER JOIN %s ul on "+
-		"il.id =ul.invoice_id WHERE ul.user_id = $1", invoicesTable, usersInvoicesTable)
+	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.clent_name, il.message,"+
+		"il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1",
+		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
 
 	return invoices, err
@@ -52,8 +56,9 @@ func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, error) {
 	var invoice dashboard.Invoice
 
-	query := fmt.Sprintf("SELECT il.id, il.amount, il.account, il.message FROM %s il INNER JOIN %s ul on "+
-		"il.id =ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2", invoicesTable, usersInvoicesTable)
+	query := fmt.Sprintf("SELECT il.id,  il.uuid, il.created_at, il.account, il.amount, il.clent_name, il.message,"+
+		" il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2",
+		invoicesTable, usersInvoicesTable)
 	err := r.db.Get(&invoice, query, userId, invoiceId)
 
 	return invoice, err

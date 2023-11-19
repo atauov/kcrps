@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Dashboard</h2>
+    <table class="table table-bordered" id="dataTable">
+        <thead class="thead-light">
+        <tr>
+            <th>ID</th>
+            <th>Дата выставления</th>
+            <th>Номер клиента</th>
+            <th>Сумма</th>
+            <th>Имя клиента</th>
+            <th>Сообщение</th>
+            <th>Статус счета</th>
+            <th>КНОПКА ДЕЙСТВИЯ</th>
+            <!-- Другие заголовки столбцов -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Здесь будут данные -->
+        </tbody>
+    </table>
+</div>
+<!-- Подключение Bootstrap JS и зависимостей -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- Ваш JavaScript скрипт -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/invoices') // Замените '/api/data' на ваш реальный API URL
+            .then(response => response.json())
+            .then(data => {
+                // Добавление данных в таблицу
+                const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                data.forEach(item => {
+                    let row = tbody.insertRow();
+                    let cell1 = row.insertCell(0);
+                    let cell2 = row.insertCell(1);
+                    let cell3 = row.insertCell(2);
+
+                    cell1.innerHTML = item.id;
+                    cell2.innerHTML = item.data1;
+                    cell3.innerHTML = item.data2;
+                    // Добавление других данных в строку таблицы
+                });
+            })
+            .catch(error => console.error('Ошибка:', error));
+    });
+
+</script>
+</body>
+</html>

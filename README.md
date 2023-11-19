@@ -3,7 +3,7 @@ dadshboard for kaspi api
 
 - for db docker
 ````
-   docker run --name=invoices-db -e POSTGRES_PASSWORD=<dbpassword> -p 5432:5432 -d --rm postgres
+   docker run --name=invoices-db -e POSTGRES_PASSWORD=<dbpassword> -p 5432:5432 -d postgres
 
 ````
 

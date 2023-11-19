@@ -1,17 +1,23 @@
 CREATE TABLE users
 (
     id serial not null unique,
-    name varchar(255) not null,
+    created_at date not null,
+    company_name varchar(255),
     username varchar(255) not null unique,
-    password_hash varchar(255) not null
+    password_hash varchar(255) not null,
+    role int not null
 );
 
 CREATE TABLE invoices
 (
     id serial not null unique,
-    amount int not null,
+    uuid int not null,
+    created_at date not null,
     account varchar(255) not null,
-    message varchar(255)
+    amount int not null,
+    client_name varchar(255),
+    message varchar(255) not null,
+    status int not null
 );
 
 CREATE TABLE users_invoices

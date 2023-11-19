@@ -7,6 +7,20 @@ import (
 	"strconv"
 )
 
+// @Summary Create invoice
+// @Security ApiKeyAuth
+// @Tags invoices
+// @Description create invoice
+// @ID invoice
+// @Accept  json
+// @Produce  json
+// @Param input body dashboard.Invoice true "invoice info"
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/invoices [post]
+
 func (h *Handler) createInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -34,6 +48,19 @@ type getAllInvoicesResponse struct {
 	Data []dashboard.Invoice `json:"data"`
 }
 
+// @Summary Get All Invoices
+// @Security ApiKeyAuth
+// @Tags invoices
+// @Description get all user invoices
+// @ID get-all-invoices
+// @Accept  json
+// @Produce  json
+// @Success 200 {integer} getAllInvoicesResponse
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/invoices [get]
+
 func (h *Handler) getAllInvoices(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -49,6 +76,19 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 		Data: invoices,
 	})
 }
+
+// @Summary Get Invoice By Id
+// @Security ApiKeyAuth
+// @Tags invoices
+// @Description get invoice by id
+// @ID get-invoice-by-id
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dashboard.Invoice
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/invoices/:id [get]
 
 func (h *Handler) getInvoiceById(c *gin.Context) {
 	userId, err := getUserId(c)

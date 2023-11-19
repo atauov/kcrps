@@ -24,11 +24,22 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api", h.userIdentity)
 	{
-		api.POST("/", h.createInvoice)
-		api.GET("/", h.getAllInvoices)
-		api.GET("/:id", h.getInvoiceById)
-		api.PUT("/:id", h.updateInvoice)
-		api.DELETE("/:id", h.deleteInvoice)
+		invoices := api.Group("/invoices")
+		{
+			invoices.POST("/", h.createInvoice)
+			invoices.GET("/", h.getAllInvoices)
+			invoices.GET("/:id", h.getInvoiceById)
+			invoices.PUT("/:id", h.updateInvoice)
+			invoices.DELETE("/:id", h.deleteInvoice)
+		}
+	}
+
+	router.LoadHTMLGlob("templates/*")
+
+	panel := router.Group("panel")
+	{
+		panel.GET("/", h.getPanelPage)
+		panel.GET("/login", h.getLoginPage)
 	}
 	return router
 }
