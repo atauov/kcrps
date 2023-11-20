@@ -36,10 +36,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.LoadHTMLGlob("templates/*")
 
-	panel := router.Group("panel")
-	{
-		panel.GET("/", h.getPanelPage)
-		panel.GET("/login", h.getLoginPage)
-	}
+	router.GET("/panel", h.getPanelPage)
+	router.GET("/login", h.getLoginPage)
+	router.GET("/register", h.getRegisterPage)
+
 	return router
 }

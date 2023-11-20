@@ -4,7 +4,7 @@ import (
 	"dashboard"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"time"
+	"strconv"
 )
 
 type InvoicePostgres struct {
@@ -23,10 +23,9 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 
 	var id int
 	createInvoiceQuery := fmt.Sprintf(
-		"INSERT INTO %s (uuid, created_at, account, amount, client_name, message, status)"+
-			"VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id", invoicesTable)
-	row := tx.QueryRow(createInvoiceQuery, invoice.UUID, time.Now(), invoice.Account, invoice.Amount, invoice.ClientName,
-		invoice.Message, invoice.Status)
+		"INSERT INTO %s (created_at, account, amount, status)"+
+			"VALUES (NOW(), $1, $2, $3) RETURNING id", invoicesTable)
+	row := tx.QueryRow(createInvoiceQuery, invoice.Account, invoice.Amount, 0)
 	if err = row.Scan(&id); err != nil {
 		tx.Rollback()
 		return 0, err
@@ -39,13 +38,22 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 		return 0, err
 	}
 
+	invoice.UUID = 100000 + id
+	invoice.Message = strconv.Itoa(invoice.UUID) + " " + invoice.Message
+	updateUuidQuery := fmt.Sprintf("UPDATE %s SET uuid=$1, message=$2 WHERE id=$3", invoicesTable)
+	_, err = tx.Exec(updateUuidQuery, invoice.UUID, invoice.Message, id)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
 	return id, tx.Commit()
 }
 
 func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 	var invoices []dashboard.Invoice
 
-	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.clent_name, il.message,"+
+	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
 		"il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"dashboard"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -28,7 +29,12 @@ func (h *Handler) createInvoice(c *gin.Context) {
 	}
 
 	var input dashboard.Invoice
-	if err := c.BindJSON(&input); err != nil {
+	if err = c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err = validateInputInvoice(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -134,4 +140,23 @@ func (h *Handler) deleteInvoice(c *gin.Context) {
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
+}
+
+func validateInputInvoice(invoice *dashboard.Invoice) error {
+	if invoice.Amount < 1 || invoice.Amount > 999999999 {
+		return errors.New("incorrect amount")
+	}
+	if len(invoice.Account) != 11 {
+		return errors.New("incorrect account")
+	}
+	if invoice.Account[:2] != "87" {
+		return errors.New("incorrect account")
+	}
+	if _, err := strconv.Atoi(invoice.Account); err != nil {
+		return err
+	}
+	if len(invoice.Message) > 20 {
+		invoice.Message = invoice.Message[:20]
+	}
+	return nil
 }

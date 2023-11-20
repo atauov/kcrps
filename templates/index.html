@@ -7,8 +7,23 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
+
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">Dashboard</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="/login">Войти</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <div class="container mt-5">
-    <h2>Dashboard</h2>
+    <h2>Все счета</h2>
     <table class="table table-bordered" id="dataTable">
         <thead class="thead-light">
         <tr>
@@ -20,7 +35,6 @@
             <th>Сообщение</th>
             <th>Статус счета</th>
             <th>КНОПКА ДЕЙСТВИЯ</th>
-            <!-- Другие заголовки столбцов -->
         </tr>
         </thead>
         <tbody>
@@ -28,6 +42,7 @@
         </tbody>
     </table>
 </div>
+
 <!-- Подключение Bootstrap JS и зависимостей -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -35,26 +50,44 @@
 <!-- Ваш JavaScript скрипт -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/invoices') // Замените '/api/data' на ваш реальный API URL
+        fetch('http://localhost:8889/api/invoices', {
+            method: 'GET',
+            headers: {
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
+            }
+        })
             .then(response => response.json())
-            .then(data => {
-                // Добавление данных в таблицу
-                const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-                data.forEach(item => {
-                    let row = tbody.insertRow();
-                    let cell1 = row.insertCell(0);
-                    let cell2 = row.insertCell(1);
-                    let cell3 = row.insertCell(2);
-
-                    cell1.innerHTML = item.id;
-                    cell2.innerHTML = item.data1;
-                    cell3.innerHTML = item.data2;
-                    // Добавление других данных в строку таблицы
-                });
+            .then(dataObject => {
+                fillTable(dataObject); // Функция для заполнения таблицы
             })
-            .catch(error => console.error('Ошибка:', error));
-    });
+            .catch(error => {
+                console.error('Ошибка при загрузке данных:', error);
+            });    });
+
+    function fillTable(dataObject) {
+        let tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+
+        dataObject.data.forEach(item => {
+            let row = tableBody.insertRow();
+
+            row.insertCell(0).textContent = item.id;
+            row.insertCell(1).textContent = item['created-at'];
+            row.insertCell(2).textContent = item.account;
+            row.insertCell(3).textContent = item.amount;
+            row.insertCell(4).textContent = item['client-name'];
+            row.insertCell(5).textContent = item.message;
+            row.insertCell(6).textContent = item.status;
+
+            let actionCell = row.insertCell(7);
+            let actionButton = document.createElement('button');
+            actionButton.textContent = 'Действие';
+            actionButton.className = 'btn btn-primary';
+            actionCell.appendChild(actionButton);
+        });
+    }
 
 </script>
+
 </body>
 </html>

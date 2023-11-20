@@ -11,12 +11,12 @@ CREATE TABLE users
 CREATE TABLE invoices
 (
     id serial not null unique,
-    uuid int not null,
+    uuid int,
     created_at date not null,
     account varchar(255) not null,
     amount int not null,
     client_name varchar(255),
-    message varchar(255) not null,
+    message varchar(255),
     status int not null
 );
 
