@@ -3,6 +3,7 @@ package handler
 import (
 	"dashboard"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -29,6 +30,7 @@ func (h *Handler) createInvoice(c *gin.Context) {
 	}
 
 	var input dashboard.Invoice
+
 	if err = c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -48,6 +50,10 @@ func (h *Handler) createInvoice(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
+
+	if err = sendInvoice(&input); err != nil {
+		fmt.Println(err)
+	}
 }
 
 type getAllInvoicesResponse struct {
@@ -155,8 +161,8 @@ func validateInputInvoice(invoice *dashboard.Invoice) error {
 	if _, err := strconv.Atoi(invoice.Account); err != nil {
 		return err
 	}
-	if len(invoice.Message) > 20 {
-		invoice.Message = invoice.Message[:20]
+	if len([]rune(invoice.Message)) > 40 {
+		invoice.Message = string([]rune(invoice.Message)[:40])
 	}
 	return nil
 }

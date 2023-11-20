@@ -23,9 +23,9 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 
 	var id int
 	createInvoiceQuery := fmt.Sprintf(
-		"INSERT INTO %s (created_at, account, amount, status)"+
-			"VALUES (NOW(), $1, $2, $3) RETURNING id", invoicesTable)
-	row := tx.QueryRow(createInvoiceQuery, invoice.Account, invoice.Amount, 0)
+		"INSERT INTO %s (created_at, account, amount, client_name, status)"+
+			"VALUES (NOW(), $1, $2, $3, $4) RETURNING id", invoicesTable)
+	row := tx.QueryRow(createInvoiceQuery, invoice.Account, invoice.Amount, "No", 0)
 	if err = row.Scan(&id); err != nil {
 		tx.Rollback()
 		return 0, err

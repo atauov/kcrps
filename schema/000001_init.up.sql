@@ -1,7 +1,7 @@
 CREATE TABLE users
 (
     id serial not null unique,
-    created_at date not null,
+    created_at timestamp not null,
     company_name varchar(255),
     username varchar(255) not null unique,
     password_hash varchar(255) not null,
@@ -12,7 +12,7 @@ CREATE TABLE invoices
 (
     id serial not null unique,
     uuid int,
-    created_at date not null,
+    created_at timestamp not null,
     account varchar(255) not null,
     amount int not null,
     client_name varchar(255),
