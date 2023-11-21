@@ -23,12 +23,28 @@
 </nav>
 
 <div class="container mt-5">
-    <h2>Все счета</h2>
+    <h2>Добавить счет</h2>
+    <form id="addInvoiceForm" class="form-inline">
+        <div class="form-group mb-2">
+            <label for="accountNumber" class="sr-only">Номер</label>
+            <input type="text" class="form-control" id="accountNumber" placeholder="Номер" required>
+        </div>
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="amount" class="sr-only">Сумма</label>
+            <input type="number" class="form-control" id="amount" placeholder="Сумма" required>
+        </div>
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="message" class="sr-only">Сообщение</label>
+            <input type="text" class="form-control" id="message" placeholder="Сообщение">
+        </div>
+        <button type="submit" class="btn btn-primary mb-2" id="new_invoice">Отправить</button>
+    </form>
+    <h2 class="mt-5">Все счета</h2>
     <table class="table table-bordered" id="dataTable">
         <thead class="thead-light">
         <tr>
             <th>ID</th>
-            <th>Дата выставления</th>
+            <th>Дата и время</th>
             <th>Номер клиента</th>
             <th>Сумма</th>
             <th>Имя клиента</th>
@@ -50,7 +66,7 @@
 <!-- Ваш JavaScript скрипт -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('http://localhost:8889/api/invoices', {
+        fetch('./api/invoices', {
             method: 'GET',
             headers: {
                 'Authorization': "Bearer " + localStorage.getItem('jwt')
@@ -72,21 +88,64 @@
             let row = tableBody.insertRow();
 
             row.insertCell(0).textContent = item.id;
-            row.insertCell(1).textContent = item['created-at'];
+            row.insertCell(1).textContent = (new Date(item['created-at'])).toLocaleString();
             row.insertCell(2).textContent = item.account;
             row.insertCell(3).textContent = item.amount;
             row.insertCell(4).textContent = item['client-name'];
             row.insertCell(5).textContent = item.message;
-            row.insertCell(6).textContent = item.status;
+            if (item.status == 0) {
+            row.insertCell(6).textContent = "Счет принят в обработку"
+            };
 
             let actionCell = row.insertCell(7);
             let actionButton = document.createElement('button');
-            actionButton.textContent = 'Действие';
+            actionButton.textContent = 'Действие1';
             actionButton.className = 'btn btn-primary';
             actionCell.appendChild(actionButton);
         });
     }
 
+    document.getElementById('addInvoiceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const submitButton = document.getElementById('new_invoice');
+    submitButton.disabled = true;
+
+    const accountNumber = document.getElementById('accountNumber').value;
+    const amount = document.getElementById('amount').value;
+    const message = document.getElementById('message').value;
+
+    const invoiceData = {
+        account: accountNumber,
+        amount: parseInt(amount, 10),
+        message: message
+    };
+
+    fetch('./api/invoices', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + localStorage.getItem('jwt')
+        },
+        body: JSON.stringify(invoiceData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Счет успешно добавлен:', data);
+        location.reload();
+        // Опционально: обновите таблицу или очистите форму
+    })
+    .catch(error => {
+        console.error('Ошибка при добавлении счета:', error);
+        alert('Ошибка при добавлении счета');
+    })
+    .finally(() => {
+        // Разблокировка кнопки через 2 секунды
+        setTimeout(() => {
+            submitButton.disabled = false;
+        }, 2000);
+    });
+});
 </script>
 
 </body>

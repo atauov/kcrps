@@ -3,8 +3,9 @@ package repository
 import (
 	"dashboard"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"strconv"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type InvoicePostgres struct {
@@ -54,7 +55,7 @@ func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 	var invoices []dashboard.Invoice
 
 	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
-		"il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1",
+		"il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id DESC",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
 

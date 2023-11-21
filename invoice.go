@@ -9,6 +9,6 @@ type Invoice struct {
 	Account    string    `json:"account" db:"account" binding:"required"`
 	Amount     int       `json:"amount" db:"amount" binding:"required"`
 	ClientName string    `json:"client-name" db:"client_name"`
-	Message    string    `json:"message" db:"message" binding:"required"`
+	Message    string    `json:"message" db:"message"`
 	Status     int       `json:"status" db:"status"`
 }

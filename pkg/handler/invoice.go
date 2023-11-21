@@ -3,10 +3,10 @@ package handler
 import (
 	"dashboard"
 	"errors"
-	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary Create invoice
@@ -51,9 +51,9 @@ func (h *Handler) createInvoice(c *gin.Context) {
 		"id": id,
 	})
 
-	if err = sendInvoice(&input); err != nil {
-		fmt.Println(err)
-	}
+	// if err = sendInvoice(&input); err != nil {
+	// 	fmt.Println(err)
+	// }
 }
 
 type getAllInvoicesResponse struct {
