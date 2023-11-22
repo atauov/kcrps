@@ -73,8 +73,9 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, err
 	return invoice, err
 }
 
-func (r *InvoicePostgres) Delete(userId, invoiceId int) error {
-	query := fmt.Sprintf("DELETE FROM %s il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+func (r *InvoicePostgres) Cancel(userId, invoiceId int) error {
+	//TODO 4-1 or 3-1 update status
+	query := fmt.Sprintf("UPDATE %s SET status=$3, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
 		invoicesTable, usersInvoicesTable)
 	_, err := r.db.Exec(query, userId, invoiceId)
 

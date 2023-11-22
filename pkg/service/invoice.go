@@ -24,6 +24,6 @@ func (s *InvoiceService) GetById(userId, invoiceId int) (dashboard.Invoice, erro
 	return s.repo.GetById(userId, invoiceId)
 }
 
-func (s *InvoiceService) Delete(userId, invoiceId int) error {
-	return s.repo.Delete(userId, invoiceId)
+func (s *InvoiceService) Cancel(userId, invoiceId int) error {
+	return s.repo.Cancel(userId, invoiceId)
 }

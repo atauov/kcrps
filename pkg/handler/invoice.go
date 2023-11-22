@@ -126,7 +126,7 @@ func (h *Handler) updateInvoice(c *gin.Context) {
 
 }
 
-func (h *Handler) deleteInvoice(c *gin.Context) {
+func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		return
@@ -138,7 +138,7 @@ func (h *Handler) deleteInvoice(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Delete(userId, id)
+	err = h.services.Cancel(userId, id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
