@@ -122,10 +122,6 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 	c.JSON(http.StatusOK, invoice)
 }
 
-func (h *Handler) updateInvoice(c *gin.Context) {
-
-}
-
 func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
