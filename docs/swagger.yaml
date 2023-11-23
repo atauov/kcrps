@@ -1,0 +1,14 @@
+basePath: /
+host: localhost:8089
+info:
+  contact: {}
+  description: API server for custom remote payment service in kaspi mobile POS
+  title: kaspi gray API service
+  version: "0.1"
+paths: {}
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

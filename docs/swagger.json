@@ -1,0 +1,19 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API server for custom remote payment service in kaspi mobile POS",
+        "title": "kaspi gray API service",
+        "contact": {},
+        "version": "0.1"
+    },
+    "host": "localhost:8089",
+    "basePath": "/",
+    "paths": {},
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
