@@ -22,7 +22,6 @@ import (
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/invoices [post]
-
 func (h *Handler) createInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -72,7 +71,6 @@ type getAllInvoicesResponse struct {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/invoices [get]
-
 func (h *Handler) getAllInvoices(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -101,7 +99,6 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/invoices/:id [get]
-
 func (h *Handler) getInvoiceById(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -134,7 +131,6 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/invoices/:id [delete]
-
 func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {

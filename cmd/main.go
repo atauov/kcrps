@@ -6,26 +6,26 @@ import (
 	"dashboard/pkg/handler"
 	"dashboard/pkg/repository"
 	"dashboard/pkg/service"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // @title kaspi gray API service
 // @version 0.1
 // @description API server for custom remote payment service in kaspi mobile POS
 
-// @host localhost:8089
+// @host https://145.249.246.27
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 

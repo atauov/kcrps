@@ -2,23 +2,24 @@ package handler
 
 import (
 	"dashboard"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary SignUp
 // @Tags auth
 // @Description create account
 // @ID create-account
-// @Accept json
-// @Produce json
+// @Accept  json
+// @Produce  json
 // @Param input body dashboard.User true "account info"
 // @Success 200 {integer} integer 1
-// @Failure 400, 404 {object} errorResponse
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /auth/sign-up [post]
-
 func (h *Handler) signUp(c *gin.Context) {
 	var input dashboard.User
 
@@ -51,11 +52,11 @@ type signInInput struct {
 // @Produce json
 // @Param input body signInInput true "credentials"
 // @Success 200 {integer} string "token"
-// @Failure 400, 404 {object} errorResponse
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /auth/sign-in [post]
-
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 
