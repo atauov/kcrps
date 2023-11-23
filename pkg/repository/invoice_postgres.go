@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/atauov/kcrps"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,7 +17,7 @@ func NewInvoicePostgres(db *sqlx.DB) *InvoicePostgres {
 	return &InvoicePostgres{db: db}
 }
 
-func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, error) {
+func (r *InvoicePostgres) Create(userId int, invoice kcrps.Invoice) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -51,8 +52,8 @@ func (r *InvoicePostgres) Create(userId int, invoice dashboard.Invoice) (int, er
 	return id, tx.Commit()
 }
 
-func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
-	var invoices []dashboard.Invoice
+func (r *InvoicePostgres) GetAll(userId int) ([]kcrps.Invoice, error) {
+	var invoices []kcrps.Invoice
 
 	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
 		"il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id DESC",
@@ -62,8 +63,8 @@ func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 	return invoices, err
 }
 
-func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, error) {
-	var invoice dashboard.Invoice
+func (r *InvoicePostgres) GetById(userId, invoiceId int) (kcrps.Invoice, error) {
+	var invoice kcrps.Invoice
 
 	query := fmt.Sprintf("SELECT il.id,  il.uuid, il.created_at, il.account, il.amount, il.clent_name, il.message,"+
 		" il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2",
@@ -74,7 +75,7 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, err
 }
 
 func (r *InvoicePostgres) Cancel(userId, invoiceId int) error {
-	var invoice dashboard.Invoice
+	var invoice kcrps.Invoice
 	var newStatusValue int
 
 	query := fmt.Sprintf("SELECT il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id=$1 AND ul.invoice_id=$2",

@@ -1,19 +1,20 @@
 package service
 
 import (
+	"github.com/atauov/kcrps"
 	"github.com/atauov/kcrps/pkg/repository"
 )
 
 type Authorization interface {
-	CreateUser(user dashboard.User) (int, error)
+	CreateUser(user kcrps.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
 
 type Invoice interface {
-	Create(userId int, invoice dashboard.Invoice) (int, error)
-	GetAll(userId int) ([]dashboard.Invoice, error)
-	GetById(userId, invoiceId int) (dashboard.Invoice, error)
+	Create(userId int, invoice kcrps.Invoice) (int, error)
+	GetAll(userId int) ([]kcrps.Invoice, error)
+	GetById(userId, invoiceId int) (kcrps.Invoice, error)
 	Cancel(userId, invoiceId int) error
 }
 

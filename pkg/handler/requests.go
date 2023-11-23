@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/atauov/kcrps"
 )
 
 const flask = "http://145.249.246.27:8080"
 
-func sendInvoice(invoice *dashboard.Invoice) error {
+func sendInvoice(invoice *kcrps.Invoice) error {
 	invoice.Account = invoice.Account[1:]
 	jsonData, err := json.Marshal(invoice)
 	if err != nil {

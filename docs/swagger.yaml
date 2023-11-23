@@ -1,6 +1,21 @@
 basePath: /
 definitions:
-  dashboard.Invoice:
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.signInInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  kcrps.Invoice:
     properties:
       account:
         type: string
@@ -26,7 +41,7 @@ definitions:
     - account
     - amount
     type: object
-  dashboard.User:
+  kcrps.User:
     properties:
       company_name:
         type: string
@@ -38,21 +53,6 @@ definitions:
         type: string
     required:
     - company_name
-    - password
-    - username
-    type: object
-  handler.errorResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  handler.signInInput:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
     - password
     - username
     type: object
@@ -108,7 +108,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dashboard.Invoice'
+          $ref: '#/definitions/kcrps.Invoice'
       produces:
       - application/json
       responses:
@@ -149,7 +149,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dashboard.Invoice'
+            $ref: '#/definitions/kcrps.Invoice'
         "400":
           description: Bad Request
           schema:
@@ -182,7 +182,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dashboard.Invoice'
+            $ref: '#/definitions/kcrps.Invoice'
         "400":
           description: Bad Request
           schema:
@@ -255,7 +255,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dashboard.User'
+          $ref: '#/definitions/kcrps.User'
       produces:
       - application/json
       responses:

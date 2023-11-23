@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dashboard.Invoice"
+                            "$ref": "#/definitions/kcrps.Invoice"
                         }
                     }
                 ],
@@ -153,7 +153,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dashboard.Invoice"
+                            "$ref": "#/definitions/kcrps.Invoice"
                         }
                     },
                     "400": {
@@ -204,7 +204,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dashboard.Invoice"
+                            "$ref": "#/definitions/kcrps.Invoice"
                         }
                     },
                     "400": {
@@ -314,7 +314,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dashboard.User"
+                            "$ref": "#/definitions/kcrps.User"
                         }
                     }
                 ],
@@ -354,7 +354,30 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dashboard.Invoice": {
+        "handler.errorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.signInInput": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "kcrps.Invoice": {
             "type": "object",
             "required": [
                 "account",
@@ -393,7 +416,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dashboard.User": {
+        "kcrps.User": {
             "type": "object",
             "required": [
                 "company_name",
@@ -409,29 +432,6 @@ const docTemplate = `{
                 },
                 "role": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.errorResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.signInInput": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "type": "string"
                 },
                 "username": {
                     "type": "string"

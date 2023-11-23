@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/atauov/kcrps"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +16,7 @@ import (
 // @ID invoice
 // @Accept  json
 // @Produce  json
-// @Param input body dashboard.Invoice true "invoice info"
+// @Param input body kcrps.Invoice true "invoice info"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
@@ -27,7 +28,7 @@ func (h *Handler) createInvoice(c *gin.Context) {
 		return
 	}
 
-	var input dashboard.Invoice
+	var input kcrps.Invoice
 
 	if err = c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -55,7 +56,7 @@ func (h *Handler) createInvoice(c *gin.Context) {
 }
 
 type getAllInvoicesResponse struct {
-	Data []dashboard.Invoice `json:"data"`
+	Data []kcrps.Invoice `json:"data"`
 }
 
 // @Summary Get All Invoices
@@ -93,7 +94,7 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 // @ID get-invoice-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dashboard.Invoice
+// @Success 200 {object} kcrps.Invoice
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -125,7 +126,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 // @ID cancel-invoice-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dashboard.Invoice
+// @Success 200 {object} kcrps.Invoice
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -152,7 +153,7 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 	})
 }
 
-func validateInputInvoice(invoice *dashboard.Invoice) error {
+func validateInputInvoice(invoice *kcrps.Invoice) error {
 	if invoice.Amount < 1 || invoice.Amount > 999999999 {
 		return errors.New("incorrect amount")
 	}

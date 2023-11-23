@@ -4,9 +4,11 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"time"
+
+	"github.com/atauov/kcrps"
 	"github.com/atauov/kcrps/pkg/repository"
 	"github.com/golang-jwt/jwt"
-	"time"
 )
 
 const (
@@ -28,7 +30,7 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user dashboard.User) (int, error) {
+func (s *AuthService) CreateUser(user kcrps.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
 }

@@ -1,4 +1,4 @@
-# dashboard
+# kcrps (KASPI CUSTOM REMOTE PAYMENT SYSTEM)
 dadshboard for kaspi api
 
 - for db docker

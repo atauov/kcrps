@@ -1,18 +1,19 @@
 package repository
 
 import (
+	"github.com/atauov/kcrps"
 	"github.com/jmoiron/sqlx"
 )
 
 type Authorization interface {
-	CreateUser(user dashboard.User) (int, error)
-	GetUser(username, password string) (dashboard.User, error)
+	CreateUser(user kcrps.User) (int, error)
+	GetUser(username, password string) (kcrps.User, error)
 }
 
 type Invoice interface {
-	Create(userId int, invoice dashboard.Invoice) (int, error)
-	GetAll(userId int) ([]dashboard.Invoice, error)
-	GetById(userId, invoiceId int) (dashboard.Invoice, error)
+	Create(userId int, invoice kcrps.Invoice) (int, error)
+	GetAll(userId int) ([]kcrps.Invoice, error)
+	GetById(userId, invoiceId int) (kcrps.Invoice, error)
 	Cancel(userId, invoiceId int) error
 }
 
