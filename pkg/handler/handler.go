@@ -1,8 +1,8 @@
 package handler
 
 import (
-	_ "dashboard/docs"
-	"dashboard/pkg/service"
+	_ "github.com/atauov/kcrps/docs"
+	"github.com/atauov/kcrps/pkg/service"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

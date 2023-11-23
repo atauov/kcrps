@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"dashboard"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

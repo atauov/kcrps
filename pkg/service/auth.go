@@ -2,10 +2,9 @@ package service
 
 import (
 	"crypto/sha1"
-	"dashboard"
-	"dashboard/pkg/repository"
 	"errors"
 	"fmt"
+	"github.com/atauov/kcrps/pkg/repository"
 	"github.com/golang-jwt/jwt"
 	"time"
 )

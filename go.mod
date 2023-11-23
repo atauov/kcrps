@@ -1,4 +1,4 @@
-module dashboard
+module github.com/atauov/kcrps
 
 go 1.21.1
 

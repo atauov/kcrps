@@ -1,8 +1,7 @@
 package service
 
 import (
-	"dashboard"
-	"dashboard/pkg/repository"
+	"github.com/atauov/kcrps/pkg/repository"
 )
 
 type InvoiceService struct {

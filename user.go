@@ -1,4 +1,4 @@
-package dashboard
+package kcrps
 
 type User struct {
 	Id          int    `json:"-" db:"id"`

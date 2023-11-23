@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"dashboard"
 	"github.com/jmoiron/sqlx"
 )
 

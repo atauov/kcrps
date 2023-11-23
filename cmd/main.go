@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"dashboard"
-	"dashboard/pkg/handler"
-	"dashboard/pkg/repository"
-	"dashboard/pkg/service"
+	"github.com/atauov/kcrps"
+	"github.com/atauov/kcrps/pkg/handler"
+	"github.com/atauov/kcrps/pkg/repository"
+	"github.com/atauov/kcrps/pkg/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -52,7 +52,7 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
-	srv := new(dashboard.Server)
+	srv := new(kcrps.Server)
 
 	go func() {
 		if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {

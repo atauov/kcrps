@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"dashboard"
 	"encoding/json"
 	"log"
 	"net/http"
