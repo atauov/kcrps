@@ -16,11 +16,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// @title kaspi gray API service
+// @title kaspi custom API service
 // @version 0.1
 // @description API server for custom remote payment service in kaspi mobile POS
 
-// @host https://145.249.246.27
+// @host 145.249.246.27
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth

@@ -56,11 +56,11 @@ definitions:
     - password
     - username
     type: object
-host: https://145.249.246.27
+host: 145.249.246.27
 info:
   contact: {}
   description: API server for custom remote payment service in kaspi mobile POS
-  title: kaspi gray API service
+  title: kaspi custom API service
   version: "0.1"
 paths:
   /api/invoices:

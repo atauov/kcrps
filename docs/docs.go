@@ -451,10 +451,10 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.1",
-	Host:             "https://145.249.246.27",
+	Host:             "145.249.246.27",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "kaspi gray API service",
+	Title:            "kaspi custom API service",
 	Description:      "API server for custom remote payment service in kaspi mobile POS",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

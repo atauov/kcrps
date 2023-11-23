@@ -58,7 +58,7 @@ func (s *Server) Run(port string, handler http.Handler) error {
 		WriteTimeout:   10 * time.Second,
 		TLSConfig:      tlsConfig,
 	}
-	return s.httpServer.ListenAndServeTLS("", "")
+	return s.httpServer.ListenAndServe()
 }
 func (s *Server) Shutdown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)

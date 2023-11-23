@@ -2,11 +2,11 @@
     "swagger": "2.0",
     "info": {
         "description": "API server for custom remote payment service in kaspi mobile POS",
-        "title": "kaspi gray API service",
+        "title": "kaspi custom API service",
         "contact": {},
         "version": "0.1"
     },
-    "host": "https://145.249.246.27",
+    "host": "145.249.246.27",
     "basePath": "/",
     "paths": {
         "/api/invoices": {
