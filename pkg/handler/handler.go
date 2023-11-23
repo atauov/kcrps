@@ -2,6 +2,7 @@ package handler
 
 import (
 	"dashboard/pkg/service"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +28,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		invoices := api.Group("/invoices")
 		{
 			invoices.POST("/", h.createInvoice)
-			invoices.POST("/multi", h.createMultiInvoiceFromFile)
+			// invoices.POST("/multi", h.createMultiInvoiceFromFile)
 			invoices.POST("/:id", h.cancelInvoice)
 			invoices.GET("/", h.getAllInvoices)
 			invoices.GET("/:id", h.getInvoiceById)

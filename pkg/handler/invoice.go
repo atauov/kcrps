@@ -122,6 +122,19 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 	c.JSON(http.StatusOK, invoice)
 }
 
+// @Summary Cancel Invoice By Id
+// @Security ApiKeyAuth
+// @Tags invoices
+// @Description cancel invoice by id
+// @ID cancel-invoice-by-id
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dashboard.Invoice
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/invoices/:id [delete]
+
 func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
