@@ -134,11 +134,11 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Cancel(userId, id)
-	if err != nil {
+	if err = h.services.Cancel(userId, id); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})

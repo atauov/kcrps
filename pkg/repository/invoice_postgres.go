@@ -2,6 +2,7 @@ package repository
 
 import (
 	"dashboard"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -55,7 +56,7 @@ func (r *InvoicePostgres) GetAll(userId int) ([]dashboard.Invoice, error) {
 	var invoices []dashboard.Invoice
 
 	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
-		"il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id DESC",
+		"il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id DESC",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
 
@@ -66,7 +67,7 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, err
 	var invoice dashboard.Invoice
 
 	query := fmt.Sprintf("SELECT il.id,  il.uuid, il.created_at, il.account, il.amount, il.clent_name, il.message,"+
-		" il.status FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2",
+		" il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Get(&invoice, query, userId, invoiceId)
 
@@ -74,10 +75,26 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (dashboard.Invoice, err
 }
 
 func (r *InvoicePostgres) Cancel(userId, invoiceId int) error {
-	//TODO 4-1 or 3-1 update status
-	query := fmt.Sprintf("UPDATE %s SET status=$3, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+	var invoice dashboard.Invoice
+	var newStatusValue int
+
+	query := fmt.Sprintf("SELECT il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id=$1 AND ul.invoice_id=$2",
 		invoicesTable, usersInvoicesTable)
-	_, err := r.db.Exec(query, userId, invoiceId)
+	if err := r.db.Get(&invoice, query, userId, invoiceId); err != nil {
+		return err
+	}
+
+	if invoice.Status == 1 && invoice.InWork == 1 {
+		newStatusValue = 3
+	} else if invoice.Status == 2 {
+		newStatusValue = 4
+	} else {
+		return errors.New("cant cancel this payment right now, try later please")
+	}
+
+	query = fmt.Sprintf("UPDATE %s SET status=$3, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+		invoicesTable, usersInvoicesTable)
+	_, err := r.db.Exec(query, userId, invoiceId, newStatusValue)
 
 	return err
 }

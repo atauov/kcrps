@@ -20,6 +20,7 @@ func (s *InvoiceService) Create(userId int, invoice dashboard.Invoice) (int, err
 func (s *InvoiceService) GetAll(userId int) ([]dashboard.Invoice, error) {
 	return s.repo.GetAll(userId)
 }
+
 func (s *InvoiceService) GetById(userId, invoiceId int) (dashboard.Invoice, error) {
 	return s.repo.GetById(userId, invoiceId)
 }

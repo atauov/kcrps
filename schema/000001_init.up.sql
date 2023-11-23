@@ -17,7 +17,8 @@ CREATE TABLE invoices
     amount int not null,
     client_name varchar(255),
     message varchar(255),
-    status int not null
+    status int not null,
+    in_work int default 1,
 );
 
 CREATE TABLE users_invoices
