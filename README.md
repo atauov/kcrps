@@ -1,5 +1,14 @@
 # kcrps (KASPI CUSTOM REMOTE PAYMENT SYSTEM)
-dadshboard for kaspi api
+
+Golang
+JWT
+Swagger
+PostgreSQL
+Python
+Flask
+NOX Player
+HTML
+Bootstrap CSS
 
 - for db docker
 ````
