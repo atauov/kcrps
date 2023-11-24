@@ -22,6 +22,9 @@ type PosInvoice interface {
 	SendInvoice(userId int, invoice kcrps.Invoice) error
 	CancelInvoice(userId, invoiceId int) error
 	CancelPayment(userId, invoiceId int) error
+	UpdateStatus(id, status, inWork int) error
+	UpdateClientName(invoiceId int, clientName string) error
+	GetInWorkInvoices(userId int) ([]kcrps.Invoice, error)
 }
 
 type Service struct {
