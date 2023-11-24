@@ -22,5 +22,5 @@ func (s *PosInvoiceService) CancelInvoice(userId, invoiceId int) error {
 }
 
 func (s *PosInvoiceService) CancelPayment(userId, invoiceId int) error {
-	return s.repo.CancelPayment(userId, Invoice)
+	return s.repo.CancelPayment(userId, invoiceId)
 }
