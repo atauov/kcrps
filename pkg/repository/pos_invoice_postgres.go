@@ -9,7 +9,10 @@ import (
 	"net/http"
 )
 
-const flask = "http://localhost:8080"
+const CreateInvoiceURL = "http://localhost:8080/create-invoice"
+const CancelInvoiceURL = "http://localhost:8080/cancel-invoice"
+const CancelPaymentURL = "http://localhost:8080/cancel-payment"
+const CheckInvoicesURL = "http://localhost:8080/check-invoices"
 
 type PosInvoicePostgres struct {
 	db *sqlx.DB
@@ -25,7 +28,7 @@ func (r *PosInvoicePostgres) SendInvoice(userId int, invoice kcrps.Invoice) erro
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest(http.MethodPost, flask+"/create_invoice", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, CreateInvoiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return err
 	}
