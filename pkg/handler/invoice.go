@@ -50,7 +50,7 @@ func (h *Handler) createInvoice(c *gin.Context) {
 		"id": id,
 	})
 
-	if err = h.services.SendInvoice(1, input); err != nil {
+	if err = h.services.SendInvoice(userId, input); err != nil {
 		return
 	}
 }
