@@ -17,14 +17,22 @@ type Invoice interface {
 	Cancel(userId, invoiceId int) error
 }
 
+type PosInvoice interface {
+	SendInvoice(userId int, invoice kcrps.Invoice) error
+	CancelInvoice(userId, invoiceId int) error
+	CancelPayment(userId, invoiceId int) error
+}
+
 type Repository struct {
 	Authorization
 	Invoice
+	PosInvoice
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
 		Invoice:       NewInvoicePostgres(db),
+		PosInvoice:    NewPosInvoicePostgres(db),
 	}
 }

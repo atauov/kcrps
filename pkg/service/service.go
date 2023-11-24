@@ -18,14 +18,22 @@ type Invoice interface {
 	Cancel(userId, invoiceId int) error
 }
 
+type PosInvoice interface {
+	SendInvoice(userId int, invoice kcrps.Invoice) error
+	CancelInvoice(userId, invoiceId int) error
+	CancelPayment(userId, invoiceId int) error
+}
+
 type Service struct {
 	Authorization
 	Invoice
+	PosInvoice
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
 		Invoice:       NewInvoiceService(repos.Invoice),
+		PosInvoice:    NewPosInvoiceService(repos.PosInvoice),
 	}
 }
