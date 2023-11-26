@@ -50,9 +50,6 @@ func (h *Handler) createInvoice(c *gin.Context) {
 		"id": id,
 	})
 
-	if err = h.services.SendInvoice(userId, input); err != nil {
-		return
-	}
 }
 
 type getAllInvoicesResponse struct {
