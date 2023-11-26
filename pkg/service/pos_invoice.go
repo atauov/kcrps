@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 const CreateInvoiceURL = "http://localhost:8080/create-invoice"
@@ -24,7 +25,7 @@ func NewPosInvoiceService(repo repository.PosInvoice) *PosInvoiceService {
 	return &PosInvoiceService{repo: repo}
 }
 
-func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) (kcrps.Invoice, error) {
+func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error {
 	invoiceForFlask := RequestInvoice{
 		UserID:  userId,
 		Account: invoice.Account,
@@ -33,11 +34,11 @@ func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) (kcrp
 	}
 	jsonData, err := json.Marshal(invoiceForFlask)
 	if err != nil {
-		return invoice, err
+		return err
 	}
 	req, err := http.NewRequest(http.MethodPost, CreateInvoiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return invoice, err
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
@@ -55,25 +56,29 @@ func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) (kcrp
 	if resp.StatusCode == http.StatusOK {
 		var response ResponseInvoice
 		if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return invoice, err
+			return err
 		}
-		invoice.ClientName = response.ClientName
-		invoice.Status = 1
-		return invoice, nil
+		if err = s.repo.UpdateClientName(invoice.Id, response.ClientName); err != nil {
+			return err
+		}
+		if err = s.repo.UpdateStatus(invoice.Id, 1, 1); err != nil {
+			return err
+		}
+		return nil
 	} else if resp.StatusCode == http.StatusNotFound {
 		invoice.InWork = 0
-		return invoice, nil
+		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
-		return invoice, errors.New("error on pos, please try later")
+		return errors.New("error on pos, please try later")
 	}
 
-	return invoice, errors.New("unknown error")
+	return errors.New("unknown error")
 }
 
-func (s *PosInvoiceService) CancelInvoice(userId int, invoiceId string) error {
+func (s *PosInvoiceService) CancelInvoice(userId, invoiceId int) error {
 	invoiceCancel := RequestCancelInvoice{
 		UserID: userId,
-		ID:     invoiceId,
+		ID:     strconv.Itoa(invoiceId),
 	}
 	jsonData, err := json.Marshal(invoiceCancel)
 	if err != nil {
@@ -97,6 +102,9 @@ func (s *PosInvoiceService) CancelInvoice(userId int, invoiceId string) error {
 	}(resp.Body)
 
 	if resp.StatusCode == http.StatusOK {
+		if err = s.repo.UpdateStatus(invoiceId, 3, 0); err != nil {
+			return err
+		}
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
 		return errors.New("error on pos, please try later")
@@ -105,11 +113,11 @@ func (s *PosInvoiceService) CancelInvoice(userId int, invoiceId string) error {
 	return errors.New("unknown error")
 }
 
-func (s *PosInvoiceService) CancelPayment(userId, isToday int, invoiceId string) error {
+func (s *PosInvoiceService) CancelPayment(userId, isToday, invoiceId int) error {
 	paymentCancel := RequestCancelPayment{
 		UserID:  userId,
 		IsToday: isToday,
-		ID:      invoiceId,
+		ID:      strconv.Itoa(invoiceId),
 	}
 	jsonData, err := json.Marshal(paymentCancel)
 	if err != nil {
@@ -133,6 +141,9 @@ func (s *PosInvoiceService) CancelPayment(userId, isToday int, invoiceId string)
 	}(resp.Body)
 
 	if resp.StatusCode == http.StatusOK {
+		if err = s.repo.UpdateStatus(invoiceId, 4, 0); err != nil {
+			return err
+		}
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
 		return errors.New("error on pos, please try later")
@@ -141,7 +152,7 @@ func (s *PosInvoiceService) CancelPayment(userId, isToday int, invoiceId string)
 	return errors.New("unknown error")
 }
 
-func (s *PosInvoiceService) CheckInvoices(userId, isToday int, invoices map[string]int) (map[string]int, error) {
+func (s *PosInvoiceService) CheckInvoices(userId, isToday int, invoices map[string]int) error {
 	var IDs []string
 	for k := range invoices {
 		IDs = append(IDs, k)
@@ -154,11 +165,11 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, invoices map[stri
 	//result := make(map[string]int)
 	jsonData, err := json.Marshal(invoicesForCheck)
 	if err != nil {
-		return invoices, err
+		return err
 	}
 	req, err := http.NewRequest(http.MethodPost, CheckInvoicesURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return invoices, err
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
@@ -177,14 +188,23 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, invoices map[stri
 		result := make(map[string]int)
 		res, _ := io.ReadAll(resp.Body)
 		if err = json.Unmarshal(res, &result); err != nil {
-			return result, err
+			return err
 		}
-		return result, nil
+
+		for k, v := range result {
+			uuid, _ := strconv.Atoi(k)
+			invoiceId := uuid - 100000
+			if err = s.UpdateStatus(invoiceId, v, 0); err != nil {
+				return err
+			}
+		}
+
+		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
-		return invoices, errors.New("error on pos, please try later")
+		return errors.New("error on pos, please try later")
 	}
 
-	return invoices, errors.New("unknown error")
+	return errors.New("unknown error")
 }
 
 func (s *PosInvoiceService) UpdateStatus(id, status, inWork int) error {
