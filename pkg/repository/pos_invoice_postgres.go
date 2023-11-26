@@ -33,6 +33,5 @@ func (r *PosInvoicePostgres) GetInWorkInvoices(userId int) ([]kcrps.Invoice, err
 		"INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
-
 	return invoices, err
 }

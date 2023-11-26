@@ -3,9 +3,11 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/atauov/kcrps"
 	"github.com/atauov/kcrps/pkg/repository"
-	"log"
+	"github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 )
 
@@ -22,29 +24,45 @@ func NewPosInvoiceService(repo repository.PosInvoice) *PosInvoiceService {
 	return &PosInvoiceService{repo: repo}
 }
 
-func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error {
+func (s *PosInvoiceService) SendInvoice(invoice kcrps.Invoice) (kcrps.Invoice, error) {
 	invoice.Account = invoice.Account[1:]
 	jsonData, err := json.Marshal(invoice)
 	if err != nil {
-		return err
+		return invoice, err
 	}
 	req, err := http.NewRequest(http.MethodPost, CreateInvoiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return err
+		return invoice, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalf("Ошибка при выполнении запроса: %v", err)
+		logrus.Fatalf("Ошибка при выполнении запроса: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+			logrus.Error(err)
+		}
+	}(resp.Body)
 
-	log.Printf("Ответ сервера: %s", resp.Status)
-	return nil
+	if resp.StatusCode == http.StatusOK {
+		if resp.Status == "2" {
+			invoice.InWork = 0
+			invoice.Status = 0
+			return invoice, nil
+		} else if resp.Status == "0" {
+			invoice.Status = 1
+			//TODO parse client name
+			return invoice, nil
+		}
+	}
+
+	return invoice, errors.New("unknown error")
 }
 
-func (s *PosInvoiceService) CancelInvoice(userId, invoiceId int) error {
+func (s *PosInvoiceService) CancelInvoice(posId, invoiceId int) error {
 	return nil
 }
 
@@ -58,7 +76,6 @@ func (s *PosInvoiceService) UpdateStatus(id, status, inWork int) error {
 
 func (s *PosInvoiceService) UpdateClientName(invoiceId int, clientName string) error {
 	return s.repo.UpdateClientName(invoiceId, clientName)
-
 }
 
 func (s *PosInvoiceService) GetInWorkInvoices(userId int) ([]kcrps.Invoice, error) {

@@ -19,7 +19,7 @@ type Invoice interface {
 }
 
 type PosInvoice interface {
-	SendInvoice(userId int, invoice kcrps.Invoice) error
+	SendInvoice(invoice kcrps.Invoice) (kcrps.Invoice, error)
 	CancelInvoice(userId, invoiceId int) error
 	CancelPayment(userId, invoiceId int) error
 	UpdateStatus(id, status, inWork int) error
