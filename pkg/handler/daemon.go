@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const TimeOutSec = 10
@@ -16,9 +17,10 @@ const TimeOutSec = 10
 
 func (h *Handler) Daemon(posIDs []int) {
 	logrus.Println("daemon started")
+
 	for {
-		logrus.Println("unit of daemon started")
 		for _, posID := range posIDs {
+			logrus.Printf("unit of pos: %d daemon started", posID)
 			if _, exists := h.mutexes[posID]; !exists {
 				h.mutexes[posID] = &sync.Mutex{}
 			}

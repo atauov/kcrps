@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/atauov/kcrps"
 	"github.com/atauov/kcrps/pkg/handler"
 	"github.com/atauov/kcrps/pkg/repository"
 	"github.com/atauov/kcrps/pkg/service"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -51,9 +53,9 @@ func main() {
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
-
+	fmt.Println(viper.GetIntSlice("pos-devices"))
 	go handlers.Daemon(viper.GetIntSlice("pos-devices"))
-
+	fmt.Println(3333333333)
 	srv := new(kcrps.Server)
 
 	go func() {

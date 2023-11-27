@@ -7,5 +7,5 @@ db:
   dbname: "maindb"
   sslmode: "disable"
 
-  pos-devices:
-    - 1
+pos-devices:
+  - 1

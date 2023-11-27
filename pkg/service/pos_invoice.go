@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -34,15 +33,13 @@ func NewPosInvoiceService(repo repository.PosInvoice) *PosInvoiceService {
 }
 
 func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error {
-	fmt.Println(invoice)
-
 	invoiceForFlask := RequestInvoice{
 		UserID:  userId,
 		Account: invoice.Account[1:],
 		Amount:  invoice.Amount,
 		Message: invoice.Message,
 	}
-	fmt.Println(invoiceForFlask)
+
 	jsonData, err := json.Marshal(invoiceForFlask)
 	if err != nil {
 		return err
