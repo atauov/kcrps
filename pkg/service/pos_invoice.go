@@ -187,7 +187,6 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, IDs []string) err
 		IsToday: isToday,
 		IDs:     IDs,
 	}
-	//result := make(map[string]int)
 	jsonData, err := json.Marshal(invoicesForCheck)
 	if err != nil {
 		return err
@@ -215,7 +214,7 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, IDs []string) err
 		if err = json.Unmarshal(res, &result); err != nil {
 			return err
 		}
-
+		logrus.Println(result)
 		for k, v := range result {
 			uuid, _ := strconv.Atoi(k)
 			invoiceId := uuid - 100000
