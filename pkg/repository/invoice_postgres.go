@@ -74,27 +74,36 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (kcrps.Invoice, error) 
 	return invoice, err
 }
 
-func (r *InvoicePostgres) Cancel(userId, invoiceId int) error {
+func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
 	var invoice kcrps.Invoice
-	var newStatusValue int
-
-	query := fmt.Sprintf("SELECT il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id=$1 AND ul.invoice_id=$2",
-		invoicesTable, usersInvoicesTable)
-	if err := r.db.Get(&invoice, query, userId, invoiceId); err != nil {
+	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
+	if err := r.db.Get(&invoice, query, invoiceId); err != nil {
 		return err
 	}
-
-	if invoice.Status == 1 && invoice.InWork == 1 {
-		newStatusValue = 3
-	} else if invoice.Status == 2 {
-		newStatusValue = 4
-	} else {
-		return errors.New("cant cancel this payment right now, try later please")
+	if !(invoice.Status == 1 && invoice.InWork == 1) {
+		return errors.New("cant set invoice for cancel")
 	}
 
-	query = fmt.Sprintf("UPDATE %s SET status=$3, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+	query = fmt.Sprintf("UPDATE %s SET status=3, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
 		invoicesTable, usersInvoicesTable)
-	_, err := r.db.Exec(query, userId, invoiceId, newStatusValue)
+	_, err := r.db.Exec(query, userId, invoiceId)
+
+	return err
+}
+
+func (r *InvoicePostgres) SetInvoiceForRefund(userId, invoiceId int) error {
+	var invoice kcrps.Invoice
+	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
+	if err := r.db.Get(&invoice, query, invoiceId); err != nil {
+		return err
+	}
+	if !(invoice.Status == 2 && invoice.InWork == 0) {
+		return errors.New("cant set invoice for refund")
+	}
+
+	query = fmt.Sprintf("UPDATE %s SET status=4, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+		invoicesTable, usersInvoicesTable)
+	_, err := r.db.Exec(query, userId, invoiceId)
 
 	return err
 }

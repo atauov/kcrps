@@ -181,8 +181,10 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/api/invoices/cancel/:id": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -200,6 +202,59 @@ const docTemplate = `{
                 ],
                 "summary": "Cancel Invoice By Id",
                 "operationId": "cancel-invoice-by-id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/kcrps.Invoice"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/invoices/refund/:id": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "refund invoice by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoices"
+                ],
+                "summary": "Refund Invoice By Id",
+                "operationId": "refund-invoice-by-id",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -390,29 +445,11 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
-                "client-name": {
-                    "type": "string"
-                },
-                "created-at": {
-                    "type": "string"
-                },
                 "id": {
-                    "type": "integer"
-                },
-                "in-work": {
                     "type": "integer"
                 },
                 "message": {
                     "type": "string"
-                },
-                "pos-id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "uuid": {
-                    "type": "integer"
                 }
             }
         },
@@ -429,9 +466,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "role": {
-                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

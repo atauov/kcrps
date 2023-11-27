@@ -25,6 +25,10 @@ func (s *InvoiceService) GetById(userId, invoiceId int) (kcrps.Invoice, error) {
 	return s.repo.GetById(userId, invoiceId)
 }
 
-func (s *InvoiceService) Cancel(userId, invoiceId int) error {
-	return s.repo.Cancel(userId, invoiceId)
+func (s *InvoiceService) SetInvoiceForCancel(userId, invoiceId int) error {
+	return s.repo.SetInvoiceForCancel(userId, invoiceId)
+}
+
+func (s *InvoiceService) SetInvoiceForRefund(userId, invoiceId int) error {
+	return s.repo.SetInvoiceForRefund(userId, invoiceId)
 }

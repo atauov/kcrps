@@ -37,3 +37,12 @@ func (r *PosInvoicePostgres) GetInWorkInvoices(userId int) ([]kcrps.Invoice, err
 
 	return invoices, err
 }
+
+func (r *PosInvoicePostgres) GetInvoiceAmount(invoiceId int) (int, error) {
+	var amount int
+	query := fmt.Sprintf(`SELECT amount FROM %s WHERE id=$1`, invoicesTable)
+	if err := r.db.Get(&amount, query, invoiceId); err != nil {
+		return 0, err
+	}
+	return amount, nil
+}

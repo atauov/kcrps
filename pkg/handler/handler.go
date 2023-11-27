@@ -39,7 +39,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			invoices.POST("/", h.createInvoice)
 			// invoices.POST("/multi", h.createMultiInvoiceFromFile)
-			invoices.POST("/:id", h.cancelInvoice)
+			invoices.PUT("/cancel/:id", h.cancelInvoice)
+			invoices.PUT("/refund/:id", h.cancelPayment)
 			invoices.GET("/", h.getAllInvoices)
 			invoices.GET("/:id", h.getInvoiceById)
 		}
