@@ -18,7 +18,6 @@ type Handler struct {
 func NewHandler(services *service.Service) *Handler {
 	return &Handler{
 		services: services,
-		mutexes:  make(map[int]*sync.Mutex),
 	}
 }
 

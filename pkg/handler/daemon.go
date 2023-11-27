@@ -18,22 +18,32 @@ const TimeOutSec = 10
 
 func (h *Handler) Daemon(posIDs []int) {
 	logrus.Println("daemon started")
+	running := make(map[int]bool)
+	var runningMutex sync.Mutex
 
 	for {
 		for _, posID := range posIDs {
 			// logrus.Printf("unit of pos: %d daemon started", posID)
-			if _, exists := h.mutexes[posID]; !exists {
-				h.mutexes[posID] = &sync.Mutex{}
+			runningMutex.Lock()
+
+			if _, exists := running[posID]; !exists || !running[posID] {
+				running[posID] = true
+				runningMutex.Unlock()
+				go func(posID int) {
+					h.allOperations(posID)
+					runningMutex.Lock()
+					running[posID] = false
+					runningMutex.Unlock()
+				}(posID)
+			} else {
+				runningMutex.Unlock()
 			}
-			go h.allOperations(posID)
 		}
+		time.Sleep(TimeOutSec * time.Second)
 	}
 }
 
 func (h *Handler) allOperations(posID int) {
-	mutex := h.mutexes[posID]
-	mutex.Lock()
-	defer mutex.Unlock()
 	invoices, err := h.services.GetInWorkInvoices(posID)
 	if err != nil {
 		logrus.Error(err)
@@ -70,6 +80,4 @@ func (h *Handler) allOperations(posID int) {
 			logrus.Error(err)
 		}
 	}
-
-	time.Sleep(TimeOutSec * time.Second)
 }
