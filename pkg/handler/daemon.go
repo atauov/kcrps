@@ -4,7 +4,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"strconv"
 	"sync"
+	"time"
 )
+
+const TimeOutSec = 10
 
 //TODO service for checking status
 //TODO service for check db for invoices with in_work == 1
@@ -58,4 +61,6 @@ func (h *Handler) allOperations(posID int) {
 			logrus.Error(err)
 		}
 	}
+
+	time.Sleep(TimeOutSec * time.Second)
 }

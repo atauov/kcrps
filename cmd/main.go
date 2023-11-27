@@ -52,7 +52,7 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
-	go handlers.Daemon([]int{1})
+	go handlers.Daemon(viper.GetIntSlice("pos-devices"))
 
 	srv := new(kcrps.Server)
 
