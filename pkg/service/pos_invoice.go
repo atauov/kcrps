@@ -221,9 +221,12 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, IDs []string) err
 			if err = s.UpdateStatus(invoiceId, v, 0); err != nil {
 				return err
 			}
-
-			//TODO switch webhook by status
-
+			switch v {
+			case 2:
+				webhook(invoiceId, StatusPaymentOk)
+			case 1:
+				webhook(invoiceId, StatusInvoiceCancel)
+			}
 		}
 
 		return nil
