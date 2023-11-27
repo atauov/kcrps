@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -20,7 +21,7 @@ func (h *Handler) Daemon(posIDs []int) {
 
 	for {
 		for _, posID := range posIDs {
-			logrus.Printf("unit of pos: %d daemon started", posID)
+			// logrus.Printf("unit of pos: %d daemon started", posID)
 			if _, exists := h.mutexes[posID]; !exists {
 				h.mutexes[posID] = &sync.Mutex{}
 			}
@@ -38,6 +39,7 @@ func (h *Handler) allOperations(posID int) {
 		logrus.Error(err)
 		return
 	}
+	fmt.Println(invoices)
 	var forCheck []string
 	for _, invoice := range invoices {
 		switch invoice.Status {
@@ -62,7 +64,7 @@ func (h *Handler) allOperations(posID int) {
 			}
 		}
 	}
-
+	fmt.Println(forCheck)
 	if len(forCheck) > 0 {
 		if err = h.services.CheckInvoices(posID, 1, forCheck); err != nil {
 			logrus.Error(err)

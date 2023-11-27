@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -53,9 +52,9 @@ func main() {
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
-	fmt.Println(viper.GetIntSlice("pos-devices"))
+
 	go handlers.Daemon(viper.GetIntSlice("pos-devices"))
-	fmt.Println(3333333333)
+
 	srv := new(kcrps.Server)
 
 	go func() {

@@ -31,7 +31,7 @@ func (r *PosInvoicePostgres) GetInWorkInvoices(userId int) ([]kcrps.Invoice, err
 	var invoices []kcrps.Invoice
 
 	query := fmt.Sprintf("SELECT il.id, il.uuid, il.status, il.amount, il.account, il.message, il.in_work FROM %s il "+
-		"INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id",
+		"INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 AND il.in_work=1 ORDER BY il.id",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
 
