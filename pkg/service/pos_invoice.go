@@ -16,9 +16,15 @@ const CreateInvoiceURL = "http://localhost:8080/create-invoice"
 const CancelInvoiceURL = "http://localhost:8080/cancel-invoice"
 const CancelPaymentURL = "http://localhost:8080/cancel-payment"
 const CheckInvoicesURL = "http://localhost:8080/check-invoices"
+const WebHookURL = "http://localhost:1111/webhook"
 
 type PosInvoiceService struct {
 	repo repository.PosInvoice
+}
+
+type WebHook struct {
+	Id     int `json:"id"`
+	Status int `json:"status"`
 }
 
 func NewPosInvoiceService(repo repository.PosInvoice) *PosInvoiceService {
@@ -44,7 +50,7 @@ func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		logrus.Fatalf("Ошибка при выполнении запроса: %v", err)
+		return err
 	}
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
@@ -64,6 +70,16 @@ func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error
 		if err = s.repo.UpdateStatus(invoice.Id, 1, 1); err != nil {
 			return err
 		}
+
+		jsonWebHook, _ := json.Marshal(WebHook{
+			Id:     invoice.Id,
+			Status: 1,
+		})
+		reqWebHook, _ := http.NewRequest(http.MethodPost, WebHookURL, bytes.NewBuffer(jsonWebHook))
+		if _, err = client.Do(reqWebHook); err != nil {
+			logrus.Error(err)
+		}
+
 		return nil
 	} else if resp.StatusCode == http.StatusNotFound {
 		invoice.InWork = 0
@@ -105,6 +121,16 @@ func (s *PosInvoiceService) CancelInvoice(userId, invoiceId int) error {
 		if err = s.repo.UpdateStatus(invoiceId, 3, 0); err != nil {
 			return err
 		}
+
+		jsonWebHook, _ := json.Marshal(WebHook{
+			Id:     invoiceId,
+			Status: 3,
+		})
+		reqWebHook, _ := http.NewRequest(http.MethodPost, WebHookURL, bytes.NewBuffer(jsonWebHook))
+		if _, err = client.Do(reqWebHook); err != nil {
+			logrus.Error(err)
+		}
+
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
 		return errors.New("error on pos, please try later")
@@ -144,6 +170,16 @@ func (s *PosInvoiceService) CancelPayment(userId, isToday, invoiceId int) error 
 		if err = s.repo.UpdateStatus(invoiceId, 4, 0); err != nil {
 			return err
 		}
+
+		jsonWebHook, _ := json.Marshal(WebHook{
+			Id:     invoiceId,
+			Status: 4,
+		})
+		reqWebHook, _ := http.NewRequest(http.MethodPost, WebHookURL, bytes.NewBuffer(jsonWebHook))
+		if _, err = client.Do(reqWebHook); err != nil {
+			logrus.Error(err)
+		}
+
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
 		return errors.New("error on pos, please try later")
@@ -152,11 +188,7 @@ func (s *PosInvoiceService) CancelPayment(userId, isToday, invoiceId int) error 
 	return errors.New("unknown error")
 }
 
-func (s *PosInvoiceService) CheckInvoices(userId, isToday int, invoices map[string]int) error {
-	var IDs []string
-	for k := range invoices {
-		IDs = append(IDs, k)
-	}
+func (s *PosInvoiceService) CheckInvoices(userId, isToday int, IDs []string) error {
 	invoicesForCheck := RequestCheck{
 		UserID:  userId,
 		IsToday: isToday,
@@ -196,6 +228,15 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, invoices map[stri
 			invoiceId := uuid - 100000
 			if err = s.UpdateStatus(invoiceId, v, 0); err != nil {
 				return err
+			}
+
+			jsonWebHook, _ := json.Marshal(WebHook{
+				Id:     invoiceId,
+				Status: v,
+			})
+			reqWebHook, _ := http.NewRequest(http.MethodPost, WebHookURL, bytes.NewBuffer(jsonWebHook))
+			if _, err = client.Do(reqWebHook); err != nil {
+				logrus.Error(err)
 			}
 		}
 

@@ -3,6 +3,7 @@ package handler
 import (
 	_ "github.com/atauov/kcrps/docs"
 	"github.com/atauov/kcrps/pkg/service"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -11,10 +12,14 @@ import (
 
 type Handler struct {
 	services *service.Service
+	mutexes  map[int]*sync.Mutex
 }
 
 func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+	return &Handler{
+		services: services,
+		mutexes:  make(map[int]*sync.Mutex),
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
