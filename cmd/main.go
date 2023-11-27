@@ -52,6 +52,8 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
+	go handlers.Daemon([]int{1})
+
 	srv := new(kcrps.Server)
 
 	go func() {
