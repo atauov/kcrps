@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 
 	"github.com/atauov/kcrps"
 	"github.com/jmoiron/sqlx"
@@ -18,6 +19,7 @@ func NewPosInvoicePostgres(db *sqlx.DB) *PosInvoicePostgres {
 func (r *PosInvoicePostgres) UpdateStatus(id, status, inWork int) error {
 	query := fmt.Sprintf(`UPDATE %s SET status=$1, in_work=$2 WHERE id = $3`, invoicesTable)
 	_, err := r.db.Exec(query, status, inWork, id)
+	logrus.Printf("NEW STATUS = %d, IN_WORK = %d", status, inWork)
 	return err
 }
 
