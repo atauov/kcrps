@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/atauov/kcrps"
 	"github.com/jmoiron/sqlx"
 )
@@ -29,9 +30,10 @@ func (r *PosInvoicePostgres) UpdateClientName(invoiceId int, clientName string) 
 func (r *PosInvoicePostgres) GetInWorkInvoices(userId int) ([]kcrps.Invoice, error) {
 	var invoices []kcrps.Invoice
 
-	query := fmt.Sprintf("SELECT il.id, il.uuid, il.status, il.in_work FROM %s il"+
+	query := fmt.Sprintf("SELECT il.id, il.uuid, il.status, il.amount, il.account, il.message, il.in_work FROM %s il "+
 		"INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Select(&invoices, query, userId)
+
 	return invoices, err
 }

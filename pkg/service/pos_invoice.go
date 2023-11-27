@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/atauov/kcrps"
-	"github.com/atauov/kcrps/pkg/repository"
-	"github.com/sirupsen/logrus"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/atauov/kcrps"
+	"github.com/atauov/kcrps/pkg/repository"
+	"github.com/sirupsen/logrus"
 )
 
 const CreateInvoiceURL = "http://localhost:8080/create-invoice"
@@ -32,12 +34,15 @@ func NewPosInvoiceService(repo repository.PosInvoice) *PosInvoiceService {
 }
 
 func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error {
+	fmt.Println(invoice)
+
 	invoiceForFlask := RequestInvoice{
 		UserID:  userId,
-		Account: invoice.Account,
+		Account: invoice.Account[1:],
 		Amount:  invoice.Amount,
 		Message: invoice.Message,
 	}
+	fmt.Println(invoiceForFlask)
 	jsonData, err := json.Marshal(invoiceForFlask)
 	if err != nil {
 		return err
