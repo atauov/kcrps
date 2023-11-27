@@ -12,15 +12,22 @@ import (
 //TODO service for canceling invoices with date > 24 hours
 
 func (h *Handler) Daemon(posIDs []int) {
-	for _, posID := range posIDs {
-		if _, exists := h.mutexes[posID]; !exists {
-			h.mutexes[posID] = &sync.Mutex{}
+	logrus.Println("daemon started")
+	for {
+		logrus.Println("unit of daemon started")
+		for _, posID := range posIDs {
+			if _, exists := h.mutexes[posID]; !exists {
+				h.mutexes[posID] = &sync.Mutex{}
+			}
+			go h.allOperations(posID)
 		}
-		go h.allOperations(posID)
 	}
 }
 
 func (h *Handler) allOperations(posID int) {
+	mutex := h.mutexes[posID]
+	mutex.Lock()
+	defer mutex.Unlock()
 	invoices, err := h.services.GetInWorkInvoices(posID)
 	if err != nil {
 		logrus.Error(err)
