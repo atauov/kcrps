@@ -138,7 +138,41 @@ paths:
       tags:
       - invoices
   /api/invoices/:id:
-    delete:
+    get:
+      consumes:
+      - application/json
+      description: get invoice by id
+      operationId: get-invoice-by-id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kcrps.Invoice'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Invoice By Id
+      tags:
+      - invoices
+  /api/invoices/cancel/:id:
+    put:
       consumes:
       - application/json
       description: cancel invoice by id
@@ -171,11 +205,12 @@ paths:
       summary: Cancel Invoice By Id
       tags:
       - invoices
-    get:
+  /api/invoices/refund/:id:
+    put:
       consumes:
       - application/json
-      description: get invoice by id
-      operationId: get-invoice-by-id
+      description: refund invoice by id
+      operationId: refund-invoice-by-id
       produces:
       - application/json
       responses:
@@ -201,7 +236,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get Invoice By Id
+      summary: Refund Invoice By Id
       tags:
       - invoices
   /auth/sign-in:

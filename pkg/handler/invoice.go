@@ -127,7 +127,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices/:id [put]
+// @Router /api/invoices/cancel/:id [put]
 func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -161,7 +161,7 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices/:id [put]
+// @Router /api/invoices/refund/:id [put]
 func (h *Handler) cancelPayment(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
