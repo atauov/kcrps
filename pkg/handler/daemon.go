@@ -50,7 +50,12 @@ func (h *Handler) allOperations(posID int) {
 				logrus.Error(err)
 			}
 		case 4:
-			if err = h.services.CancelPayment(posID, 1, invoice.Id); err != nil {
+			amount, err := h.services.GetInvoiceAmount(invoice.Id)
+			if err != nil {
+				logrus.Error()
+				continue
+			}
+			if err = h.services.CancelPayment(posID, amount, 1, invoice.Id); err != nil {
 				logrus.Error(err)
 			}
 		}

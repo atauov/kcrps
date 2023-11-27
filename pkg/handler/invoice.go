@@ -127,7 +127,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices/:id [delete]
+// @Router /api/invoices/:id [put]
 func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -140,7 +140,41 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 		return
 	}
 
-	if err = h.services.Cancel(userId, id); err != nil {
+	if err = h.services.SetInvoiceForCancel(userId, id); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, statusResponse{
+		Status: "ok",
+	})
+}
+
+// @Summary Refund Invoice By Id
+// @Security ApiKeyAuth
+// @Tags invoices
+// @Description refund invoice by id
+// @ID refund-invoice-by-id
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} kcrps.Invoice
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/invoices/:id [put]
+func (h *Handler) cancelPayment(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+		return
+	}
+
+	if err = h.services.SetInvoiceForRefund(userId, id); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

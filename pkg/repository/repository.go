@@ -14,13 +14,15 @@ type Invoice interface {
 	Create(userId int, invoice kcrps.Invoice) (int, error)
 	GetAll(userId int) ([]kcrps.Invoice, error)
 	GetById(userId, invoiceId int) (kcrps.Invoice, error)
-	Cancel(userId, invoiceId int) error
+	SetInvoiceForCancel(userId, invoiceId int) error
+	SetInvoiceForRefund(userId, invoiceId int) error
 }
 
 type PosInvoice interface {
 	UpdateStatus(id, status, inWork int) error
 	UpdateClientName(invoiceId int, clientName string) error
 	GetInWorkInvoices(userId int) ([]kcrps.Invoice, error)
+	GetInvoiceAmount(invoiceId int) (int, error)
 }
 
 type Repository struct {
