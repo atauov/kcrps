@@ -31,8 +31,10 @@ type PosInvoiceService struct {
 }
 
 type WebHook struct {
-	Id     int    `json:"id"`
-	Status string `json:"status"`
+	Id         int    `json:"id"`
+	Status     string `json:"status"`
+	Account    string `json:"account"`
+	ClientName string `json:"client-name"`
 }
 
 func NewPosInvoiceService(repo repository.PosInvoice) *PosInvoiceService {
@@ -80,13 +82,13 @@ func (s *PosInvoiceService) SendInvoice(userId int, invoice kcrps.Invoice) error
 			return err
 		}
 
-		webhook(invoice.Id, StatusInvoiceOk)
+		webhook(invoice.Id, StatusInvoiceOk, invoice.Account, response.ClientName)
 
 		return nil
 	} else if resp.StatusCode == http.StatusNotFound {
 		invoice.InWork = 0
 
-		webhook(invoice.Id, StatusNoAccount)
+		webhook(invoice.Id, StatusNoAccount, invoice.Account, "unknown")
 
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
@@ -127,7 +129,7 @@ func (s *PosInvoiceService) CancelInvoice(userId, invoiceId int) error {
 			return err
 		}
 
-		webhook(invoiceId, StatusInvoiceCancel)
+		webhook(invoiceId, StatusInvoiceCancel, "", "")
 
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
@@ -171,7 +173,7 @@ func (s *PosInvoiceService) CancelPayment(userId, amount, isToday, invoiceId int
 			return err
 		}
 
-		webhook(invoiceId, StatusPaymentRefund)
+		webhook(invoiceId, StatusPaymentRefund, "", "")
 
 		return nil
 	} else if resp.StatusCode == http.StatusInternalServerError {
@@ -199,7 +201,7 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, IDs []string) err
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		logrus.Fatalf("Ошибка при выполнении запроса: %v", err)
+		logrus.Errorf("Ошибка при выполнении запроса: %v", err)
 	}
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
@@ -223,9 +225,9 @@ func (s *PosInvoiceService) CheckInvoices(userId, isToday int, IDs []string) err
 			}
 			switch v {
 			case 2:
-				webhook(invoiceId, StatusPaymentOk)
+				webhook(invoiceId, StatusPaymentOk, "", "")
 			case 1:
-				webhook(invoiceId, StatusInvoiceCancel)
+				webhook(invoiceId, StatusInvoiceCancel, "", "")
 			}
 		}
 
@@ -253,10 +255,12 @@ func (s *PosInvoiceService) GetInvoiceAmount(invoiceId int) (int, error) {
 	return s.repo.GetInvoiceAmount(invoiceId)
 }
 
-func webhook(invoiceId int, status string) {
+func webhook(invoiceId int, status string, account string, clientName string) {
 	jsonWebHook, _ := json.Marshal(WebHook{
-		Id:     invoiceId,
-		Status: status,
+		Id:         invoiceId,
+		Status:     status,
+		Account:    account,
+		ClientName: clientName,
 	})
 	client := &http.Client{}
 	resp, _ := http.NewRequest(http.MethodPost, WebHookURL, bytes.NewBuffer(jsonWebHook))

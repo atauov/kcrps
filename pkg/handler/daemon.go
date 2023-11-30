@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -49,8 +48,9 @@ func (h *Handler) allOperations(posID int) {
 		logrus.Error(err)
 		return
 	}
-	fmt.Println(invoices)
+
 	var forCheck []string
+
 	for _, invoice := range invoices {
 		switch invoice.Status {
 		case 0:
@@ -66,7 +66,7 @@ func (h *Handler) allOperations(posID int) {
 		case 4:
 			amount, err := h.services.GetInvoiceAmount(invoice.Id)
 			if err != nil {
-				logrus.Error()
+				logrus.Error(err)
 				continue
 			}
 			if err = h.services.CancelPayment(posID, amount, 1, invoice.Id); err != nil {
@@ -74,7 +74,6 @@ func (h *Handler) allOperations(posID int) {
 			}
 		}
 	}
-	fmt.Println(forCheck)
 	if len(forCheck) > 0 {
 		if err = h.services.CheckInvoices(posID, 1, forCheck); err != nil {
 			logrus.Error(err)
