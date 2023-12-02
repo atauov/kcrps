@@ -84,9 +84,8 @@ func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
 		return errors.New("cant set invoice for cancel")
 	}
 
-	query = fmt.Sprintf("UPDATE %s AS il SET il.status=3, il.in_work=1 "+
-		"FROM %s AS ul WHERE il.id = ul.invoice_id AND ul.user_id = $1 AND ul.invoice_id = $2",
-		invoicesTable, usersInvoicesTable)
+	query = fmt.Sprint("UPDATE invoices SET status=3, in_work=1 FROM users_invoices " +
+		"WHERE invoices.id=users_invoices.invoice_id AND users_invoices.user_id=$1 AND users_invoices.invoice_id = $2")
 	_, err := r.db.Exec(query, userId, invoiceId)
 
 	return err
@@ -102,9 +101,8 @@ func (r *InvoicePostgres) SetInvoiceForRefund(userId, invoiceId int) error {
 		return errors.New("cant set invoice for refund")
 	}
 
-	query = fmt.Sprintf("UPDATE %s AS il SET il.status=4, il.in_work=1 "+
-		"FROM %s AS ul WHERE il.id = ul.invoice_id AND ul.user_id = $1 AND ul.invoice_id = $2",
-		invoicesTable, usersInvoicesTable)
+	query = fmt.Sprint("UPDATE invoices SET status=4, in_work=1 FROM users_invoices " +
+		"WHERE invoices.id=users_invoices.invoice_id AND users_invoices.user_id=$1 AND users_invoices.invoice_id = $2")
 	_, err := r.db.Exec(query, userId, invoiceId)
 
 	return err
