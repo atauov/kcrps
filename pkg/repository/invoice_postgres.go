@@ -74,6 +74,7 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (kcrps.Invoice, error) 
 	return invoice, err
 }
 
+//TODO
 func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
 	var invoice kcrps.Invoice
 	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
@@ -91,6 +92,7 @@ func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
 	return err
 }
 
+//TODO
 func (r *InvoicePostgres) SetInvoiceForRefund(userId, invoiceId int) error {
 	var invoice kcrps.Invoice
 	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
