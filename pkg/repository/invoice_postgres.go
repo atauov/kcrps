@@ -74,7 +74,6 @@ func (r *InvoicePostgres) GetById(userId, invoiceId int) (kcrps.Invoice, error) 
 	return invoice, err
 }
 
-//TODO
 func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
 	var invoice kcrps.Invoice
 	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
@@ -85,14 +84,14 @@ func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
 		return errors.New("cant set invoice for cancel")
 	}
 
-	query = fmt.Sprintf("UPDATE %s SET status=3, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+	query = fmt.Sprintf("UPDATE %s AS il SET il.status=3, il.in_work=1 "+
+		"FROM %s AS ul WHERE il.id = ul.invoice_id AND ul.user_id = $1 AND ul.invoice_id = $2",
 		invoicesTable, usersInvoicesTable)
 	_, err := r.db.Exec(query, userId, invoiceId)
 
 	return err
 }
 
-//TODO
 func (r *InvoicePostgres) SetInvoiceForRefund(userId, invoiceId int) error {
 	var invoice kcrps.Invoice
 	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
@@ -103,7 +102,8 @@ func (r *InvoicePostgres) SetInvoiceForRefund(userId, invoiceId int) error {
 		return errors.New("cant set invoice for refund")
 	}
 
-	query = fmt.Sprintf("UPDATE %s SET status=4, in_work=1 il USING %s ul WHERE il.id = ul.invoice_id AND ul.user_id=$1 AND ul.invoice_id=$2",
+	query = fmt.Sprintf("UPDATE %s AS il SET il.status=4, il.in_work=1 "+
+		"FROM %s AS ul WHERE il.id = ul.invoice_id AND ul.user_id = $1 AND ul.invoice_id = $2",
 		invoicesTable, usersInvoicesTable)
 	_, err := r.db.Exec(query, userId, invoiceId)
 
