@@ -66,7 +66,7 @@ func (r *InvoicePostgres) GetAll(userId int) ([]kcrps.Invoice, error) {
 func (r *InvoicePostgres) GetById(userId, invoiceId int) (kcrps.Invoice, error) {
 	var invoice kcrps.Invoice
 
-	query := fmt.Sprintf("SELECT il.id,  il.uuid, il.created_at, il.account, il.amount, il.clent_name, il.message,"+
+	query := fmt.Sprintf("SELECT il.id,  il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
 		" il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2",
 		invoicesTable, usersInvoicesTable)
 	err := r.db.Get(&invoice, query, userId, invoiceId)

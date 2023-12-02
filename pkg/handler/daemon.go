@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"strconv"
 	"sync"
 	"time"
@@ -44,6 +45,7 @@ func (h *Handler) Daemon(posIDs []int) {
 
 func (h *Handler) allOperations(posID int) {
 	invoices, err := h.services.GetInWorkInvoices(posID)
+	log.Println(invoices)
 	if err != nil {
 		logrus.Error(err)
 		return
