@@ -18,7 +18,7 @@ const (
 	CancelInvoiceURL    = "http://localhost:8080/cancel-invoice"
 	CancelPaymentURL    = "http://localhost:8080/cancel-payment"
 	CheckInvoicesURL    = "http://localhost:8080/check-invoices"
-	WebHookURL          = "http://localhost:1111/webhook"
+	WebHookURL          = "http://192.168.0.5:1111/webhook"
 	StatusInvoiceOk     = "Invoice successful sent"
 	StatusNoAccount     = "No kaspi account on number"
 	StatusPaymentOk     = "Payment successful"
