@@ -50,6 +50,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/panel", h.getPanelPage)
 	router.GET("/login", h.getLoginPage)
 	router.GET("/register", h.getRegisterPage)
+	router.Static("/.well-known", "./.well-known")
 
 	return router
 }

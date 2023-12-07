@@ -58,7 +58,7 @@ func main() {
 	srv := new(kcrps.Server)
 
 	go func() {
-		if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		if err = srv.Run(viper.GetString("port"), handlers.InitRoutes(), os.Getenv("CERTFILE"), os.Getenv("KEYFILE")); err != nil {
 			logrus.Fatalf("Can not to run server, %s", err.Error())
 		}
 	}()
