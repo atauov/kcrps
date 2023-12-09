@@ -2,6 +2,8 @@ package handler
 
 import (
 	"errors"
+	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 
@@ -40,7 +42,9 @@ func (h *Handler) createInvoice(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Create(userId, input)
+	input.UserID = userId
+
+	id, err := h.services.Create(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,7 +78,19 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 		return
 	}
 
-	invoices, err := h.services.GetAll(userId)
+	posId, err := uuid.Parse(c.Param("pos-id"))
+	if err != nil {
+		logrus.Printf("error parsing pos-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong pos-id parameter")
+		return
+	}
+
+	input := kcrps.Invoice{
+		UserID: userId,
+		PosID:  posId,
+	}
+
+	invoices, err := h.services.GetAll(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -84,7 +100,7 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 	})
 }
 
-// @Summary Get Invoice By Id
+// @Summary Get Invoice By ID
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description get invoice by id
@@ -102,13 +118,27 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	posId, err := uuid.Parse(c.Param("pos-id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+		logrus.Printf("error parsing pos-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong pos-id parameter")
 		return
 	}
 
-	invoice, err := h.services.GetById(userId, id)
+	invoiceId, err := strconv.Atoi(c.Param("invoice-id"))
+	if err != nil {
+		logrus.Printf("error parsing invoice-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong invoice-id parameter")
+		return
+	}
+
+	input := kcrps.Invoice{
+		ID:     invoiceId,
+		UserID: userId,
+		PosID:  posId,
+	}
+
+	invoice, err := h.services.GetById(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -116,7 +146,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 	c.JSON(http.StatusOK, invoice)
 }
 
-// @Summary Cancel Invoice By Id
+// @Summary Cancel Invoice By ID
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description cancel invoice by id
@@ -134,13 +164,27 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	posId, err := uuid.Parse(c.Param("pos-id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+		logrus.Printf("error parsing pos-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong pos-id parameter")
 		return
 	}
 
-	if err = h.services.SetInvoiceForCancel(userId, id); err != nil {
+	invoiceId, err := strconv.Atoi(c.Param("invoice-id"))
+	if err != nil {
+		logrus.Printf("error parsing invoice-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong invoice-id parameter")
+		return
+	}
+
+	invoice := kcrps.Invoice{
+		UserID: userId,
+		PosID:  posId,
+		ID:     invoiceId,
+	}
+
+	if err = h.services.SetInvoiceForCancel(invoice); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -150,7 +194,7 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 	})
 }
 
-// @Summary Refund Invoice By Id
+// @Summary Refund Invoice By ID
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description refund invoice by id
@@ -168,13 +212,27 @@ func (h *Handler) cancelPayment(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	posId, err := uuid.Parse(c.Param("pos-id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+		logrus.Printf("error parsing pos-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong pos-id parameter")
 		return
 	}
 
-	if err = h.services.SetInvoiceForRefund(userId, id); err != nil {
+	invoiceId, err := strconv.Atoi(c.Param("invoice-id"))
+	if err != nil {
+		logrus.Printf("error parsing invoice-id: %s", err)
+		newErrorResponse(c, http.StatusBadRequest, "wrong invoice-id parameter")
+		return
+	}
+
+	invoice := kcrps.Invoice{
+		UserID: userId,
+		PosID:  posId,
+		ID:     invoiceId,
+	}
+
+	if err = h.services.SetInvoiceForRefund(invoice); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

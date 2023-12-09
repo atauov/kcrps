@@ -3,8 +3,6 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"strconv"
-
 	"github.com/atauov/kcrps"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,93 +15,82 @@ func NewInvoicePostgres(db *sqlx.DB) *InvoicePostgres {
 	return &InvoicePostgres{db: db}
 }
 
-func (r *InvoicePostgres) Create(userId int, invoice kcrps.Invoice) (int, error) {
+func (r *InvoicePostgres) Create(invoice kcrps.Invoice) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
 	}
 
-	var id int
-	createInvoiceQuery := fmt.Sprintf(
-		"INSERT INTO %s (created_at, account, amount, client_name, status)"+
-			"VALUES (NOW(), $1, $2, $3, $4) RETURNING id", invoicesTable)
-	row := tx.QueryRow(createInvoiceQuery, invoice.Account, invoice.Amount, "No", 0)
-	if err = row.Scan(&id); err != nil {
-		tx.Rollback()
+	var uuid int
+
+	if err = tx.QueryRow(fmt.Sprintf("SELECT COALESCE(MAX(uuid), 100000) + 1 AS next_invoice_id FROM %s "+
+		"WHERE pos_id=%s", invoicesTable, invoice.PosID)).Scan(&uuid); err != nil {
 		return 0, err
 	}
 
-	createUsersInvoicesQuery := fmt.Sprintf("INSERT INTO %s (user_id, invoice_id) VALUES ($1, $2)", usersInvoicesTable)
-	_, err = tx.Exec(createUsersInvoicesQuery, userId, id)
-	if err != nil {
-		tx.Rollback()
+	query := fmt.Sprintf("INSERT INTO %s (created_at, account, amount, client_name, status, pos_id, uuid, user_id)"+
+		"VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7)", invoicesTable)
+	tx.QueryRow(query, invoice.Account, invoice.Amount, "Unknown", STATUS1, invoice.PosID, uuid, invoice.UserID)
+	if err = tx.Commit(); err != nil {
+		if err = tx.Rollback(); err != nil {
+			return 0, err
+		}
 		return 0, err
 	}
 
-	invoice.UUID = 100000 + id
-	invoice.Message = strconv.Itoa(invoice.UUID) + " " + invoice.Message
-	updateUuidQuery := fmt.Sprintf("UPDATE %s SET uuid=$1, message=$2 WHERE id=$3", invoicesTable)
-	_, err = tx.Exec(updateUuidQuery, invoice.UUID, invoice.Message, id)
-	if err != nil {
-		tx.Rollback()
-		return 0, err
-	}
-
-	return id, tx.Commit()
+	return uuid, err
 }
 
-func (r *InvoicePostgres) GetAll(userId int) ([]kcrps.Invoice, error) {
-	var invoices []kcrps.Invoice
+func (r *InvoicePostgres) GetAll(invoice kcrps.Invoice) ([]kcrps.Invoice, error) {
+	var result []kcrps.Invoice
 
-	query := fmt.Sprintf("SELECT il.id, il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
-		"il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id =ul.invoice_id WHERE ul.user_id = $1 ORDER BY il.id DESC",
-		invoicesTable, usersInvoicesTable)
-	err := r.db.Select(&invoices, query, userId)
+	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status FROM %s"+
+		"WHERE pos_id=$1 AND user_id=$2 ORDER BY uuid DESC", invoicesTable)
+	err := r.db.Select(&result, query, invoice.PosID, invoice.UserID)
 
-	return invoices, err
+	return result, err
 }
 
-func (r *InvoicePostgres) GetById(userId, invoiceId int) (kcrps.Invoice, error) {
-	var invoice kcrps.Invoice
+func (r *InvoicePostgres) GetById(invoice kcrps.Invoice) (kcrps.Invoice, error) {
+	var result kcrps.Invoice
 
-	query := fmt.Sprintf("SELECT il.id,  il.uuid, il.created_at, il.account, il.amount, il.client_name, il.message,"+
-		" il.status, il.in_work FROM %s il INNER JOIN %s ul on il.id=ul.invoice_id WHERE ul.user_id = $1 AND ul.invoice_id = $2",
-		invoicesTable, usersInvoicesTable)
-	err := r.db.Get(&invoice, query, userId, invoiceId)
+	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status "+
+		"FROM %s WHERE WHERE uuid=$1 AND pos_id=$2 AND user_id=$3", invoicesTable)
+	err := r.db.Get(&result, query, invoice.ID, invoice.PosID, invoice.UserID)
 
-	return invoice, err
+	return result, err
 }
 
-func (r *InvoicePostgres) SetInvoiceForCancel(userId, invoiceId int) error {
-	var invoice kcrps.Invoice
-	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
-	if err := r.db.Get(&invoice, query, invoiceId); err != nil {
+func (r *InvoicePostgres) SetInvoiceForCancel(invoice kcrps.Invoice) error {
+	var invoiceExist bool
+	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s WHERE uuid=$1 AND pos_id=$2 AND user_id=$3 AND status=$4)`, invoicesTable)
+	if err := r.db.Get(&invoiceExist, query, invoice.ID, invoice.PosID, invoice.UserID, STATUS2); err != nil {
 		return err
 	}
-	if !(invoice.Status == 1 && invoice.InWork == 1) {
-		return errors.New("cant set invoice for cancel")
+
+	if !invoiceExist {
+		return errors.New("cant find invoice for cancel")
 	}
 
-	query = fmt.Sprint("UPDATE invoices SET status=3, in_work=1 FROM users_invoices " +
-		"WHERE invoices.id=users_invoices.invoice_id AND users_invoices.user_id=$1 AND users_invoices.invoice_id = $2")
-	_, err := r.db.Exec(query, userId, invoiceId)
+	query = fmt.Sprint("UPDATE %s SET status=$1 WHERE uuid=$2 AND pos_id = $3 AND user_id = $4", invoicesTable)
+	_, err := r.db.Exec(query, STATUS4, invoice.ID, invoice.PosID, invoice.UserID)
 
 	return err
 }
 
-func (r *InvoicePostgres) SetInvoiceForRefund(userId, invoiceId int) error {
-	var invoice kcrps.Invoice
-	query := fmt.Sprintf(`SELECT status, in_work FROM %s WHERE id=$1`, invoicesTable)
-	if err := r.db.Get(&invoice, query, invoiceId); err != nil {
+func (r *InvoicePostgres) SetInvoiceForRefund(invoice kcrps.Invoice) error {
+	var invoiceExist bool
+	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s WHERE uuid = $1 AND pos_id = $2 AND user_id = $3 AND status=$4)`, invoicesTable)
+	if err := r.db.Get(&invoiceExist, query, invoice.ID, invoice.PosID, invoice.UserID, STATUS9); err != nil {
 		return err
 	}
-	if !(invoice.Status == 2 && invoice.InWork == 0) {
-		return errors.New("cant set invoice for refund")
+
+	if !invoiceExist {
+		return errors.New("cant find invoice for refund")
 	}
 
-	query = fmt.Sprint("UPDATE invoices SET status=4, in_work=1 FROM users_invoices " +
-		"WHERE invoices.id=users_invoices.invoice_id AND users_invoices.user_id=$1 AND users_invoices.invoice_id = $2")
-	_, err := r.db.Exec(query, userId, invoiceId)
+	query = fmt.Sprint("UPDATE %s SET status=$1 WHERE uuid=$2 AND pos_id = $3 AND user_id = $4", invoicesTable)
+	_, err := r.db.Exec(query, STATUS10, invoice.ID, invoice.PosID, invoice.UserID)
 
 	return err
 }

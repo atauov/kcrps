@@ -3,8 +3,6 @@ package handler
 import (
 	_ "github.com/atauov/kcrps/docs"
 	"github.com/atauov/kcrps/pkg/service"
-	"sync"
-
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -12,7 +10,6 @@ import (
 
 type Handler struct {
 	services *service.Service
-	mutexes  map[int]*sync.Mutex
 }
 
 func NewHandler(services *service.Service) *Handler {
@@ -38,18 +35,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			invoices.POST("/", h.createInvoice)
 			// invoices.POST("/multi", h.createMultiInvoiceFromFile)
-			invoices.PUT("/cancel/:id", h.cancelInvoice)
-			invoices.PUT("/refund/:id", h.cancelPayment)
-			invoices.GET("/", h.getAllInvoices)
-			invoices.GET("/:id", h.getInvoiceById)
+			invoices.PUT("/cancel/:pos-id/:invoice-id", h.cancelInvoice)
+			invoices.PUT("/refund/:pos-id/:invoice-id", h.cancelPayment)
+			invoices.GET("/:pos-id", h.getAllInvoices)
+			invoices.GET("/:pos-id/:invoice-id", h.getInvoiceById)
 		}
 	}
 
-	router.LoadHTMLGlob("templates/*")
-
-	router.GET("/panel", h.getPanelPage)
-	router.GET("/login", h.getLoginPage)
-	router.GET("/register", h.getRegisterPage)
+	router.Static("/.well-known", "./.well-known")
 
 	return router
 }

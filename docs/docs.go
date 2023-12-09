@@ -147,7 +147,7 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Get Invoice By Id",
+                "summary": "Get Invoice By ID",
                 "operationId": "get-invoice-by-id",
                 "responses": {
                     "200": {
@@ -200,7 +200,7 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Cancel Invoice By Id",
+                "summary": "Cancel Invoice By ID",
                 "operationId": "cancel-invoice-by-id",
                 "responses": {
                     "200": {
@@ -253,7 +253,7 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Refund Invoice By Id",
+                "summary": "Refund Invoice By ID",
                 "operationId": "refund-invoice-by-id",
                 "responses": {
                     "200": {

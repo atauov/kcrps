@@ -53,12 +53,10 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
-	go handlers.Daemon(viper.GetIntSlice("pos-devices"))
-
 	srv := new(kcrps.Server)
 
 	go func() {
-		if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		if err = srv.Run(viper.GetString("port"), handlers.InitRoutes(), "key", "key2"); err != nil {
 			logrus.Fatalf("Can not to run server, %s", err.Error())
 		}
 	}()

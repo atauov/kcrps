@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/sirupsen/logrus"
 	"net/http"
 
 	"github.com/atauov/kcrps"
@@ -34,8 +35,10 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
+	logrus.Printf("created new user with id: %d", id)
+
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"status": "created",
 	})
 }
 
