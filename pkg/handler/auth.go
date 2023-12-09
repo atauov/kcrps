@@ -11,7 +11,7 @@ import (
 // @Summary SignUp
 // @Tags auth
 // @Description create account
-// @ID create-account
+// @UUID create-account
 // @Accept  json
 // @Produce  json
 // @Param input body kcrps.User true "account info"
@@ -50,7 +50,7 @@ type signInInput struct {
 // @Summary SignIn
 // @Tags auth
 // @Description login
-// @ID login
+// @UUID login
 // @Accept json
 // @Produce json
 // @Param input body signInInput true "credentials"

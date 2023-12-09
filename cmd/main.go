@@ -18,10 +18,10 @@ import (
 )
 
 // @title kaspi custom API service
-// @version 0.1
+// @version 0.2
 // @description API server for custom remote payment service in kaspi mobile POS
 
-// @host 145.249.246.27
+// @host api.paylab.kz
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth

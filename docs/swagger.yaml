@@ -27,19 +27,20 @@ definitions:
         type: string
       id:
         type: integer
-      in-work:
-        type: integer
       message:
         type: string
       pos-id:
-        type: integer
+        type: string
       status:
+        type: integer
+      userID:
         type: integer
       uuid:
         type: integer
     required:
     - account
     - amount
+    - pos-id
     type: object
   kcrps.User:
     properties:
@@ -47,8 +48,6 @@ definitions:
         type: string
       password:
         type: string
-      role:
-        type: integer
       username:
         type: string
     required:
@@ -56,47 +55,14 @@ definitions:
     - password
     - username
     type: object
-host: 145.249.246.27
+host: api.paylab.kz
 info:
   contact: {}
   description: API server for custom remote payment service in kaspi mobile POS
   title: kaspi custom API service
-  version: "0.1"
+  version: "0.2"
 paths:
   /api/invoices:
-    get:
-      consumes:
-      - application/json
-      description: get all user invoices
-      operationId: get-all-invoices
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get All Invoices
-      tags:
-      - invoices
     post:
       consumes:
       - application/json
@@ -137,7 +103,41 @@ paths:
       summary: Create invoice
       tags:
       - invoices
-  /api/invoices/:id:
+  /api/invoices/:pos-id:
+    get:
+      consumes:
+      - application/json
+      description: get all user invoices
+      operationId: get-all-invoices
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Invoices
+      tags:
+      - invoices
+  /api/invoices/:pos-id/:id:
     get:
       consumes:
       - application/json
@@ -168,10 +168,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get Invoice By Id
+      summary: Get Invoice By ID
       tags:
       - invoices
-  /api/invoices/cancel/:id:
+  /api/invoices/cancel/:pos-id/:id:
     put:
       consumes:
       - application/json
@@ -202,10 +202,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Cancel Invoice By Id
+      summary: Cancel Invoice By ID
       tags:
       - invoices
-  /api/invoices/refund/:id:
+  /api/invoices/refund/:pos-id/:id:
     put:
       consumes:
       - application/json
@@ -236,7 +236,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Refund Invoice By Id
+      summary: Refund Invoice By ID
       tags:
       - invoices
   /auth/sign-in:

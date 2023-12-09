@@ -4,63 +4,12 @@
         "description": "API server for custom remote payment service in kaspi mobile POS",
         "title": "kaspi custom API service",
         "contact": {},
-        "version": "0.1"
+        "version": "0.2"
     },
-    "host": "145.249.246.27",
+    "host": "api.paylab.kz",
     "basePath": "/",
     "paths": {
         "/api/invoices": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get all user invoices",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "invoices"
-                ],
-                "summary": "Get All Invoices",
-                "operationId": "get-all-invoices",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -124,7 +73,60 @@
                 }
             }
         },
-        "/api/invoices/:id": {
+        "/api/invoices/:pos-id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get all user invoices",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoices"
+                ],
+                "summary": "Get All Invoices",
+                "operationId": "get-all-invoices",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/invoices/:pos-id/:id": {
             "get": {
                 "security": [
                     {
@@ -141,7 +143,7 @@
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Get Invoice By Id",
+                "summary": "Get Invoice By ID",
                 "operationId": "get-invoice-by-id",
                 "responses": {
                     "200": {
@@ -177,7 +179,7 @@
                 }
             }
         },
-        "/api/invoices/cancel/:id": {
+        "/api/invoices/cancel/:pos-id/:id": {
             "put": {
                 "security": [
                     {
@@ -194,7 +196,7 @@
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Cancel Invoice By Id",
+                "summary": "Cancel Invoice By ID",
                 "operationId": "cancel-invoice-by-id",
                 "responses": {
                     "200": {
@@ -230,7 +232,7 @@
                 }
             }
         },
-        "/api/invoices/refund/:id": {
+        "/api/invoices/refund/:pos-id/:id": {
             "put": {
                 "security": [
                     {
@@ -247,7 +249,7 @@
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Refund Invoice By Id",
+                "summary": "Refund Invoice By ID",
                 "operationId": "refund-invoice-by-id",
                 "responses": {
                     "200": {
@@ -430,7 +432,8 @@
             "type": "object",
             "required": [
                 "account",
-                "amount"
+                "amount",
+                "pos-id"
             ],
             "properties": {
                 "account": {
@@ -439,23 +442,11 @@
                 "amount": {
                     "type": "integer"
                 },
-                "client-name": {
-                    "type": "string"
-                },
-                "created-at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "in-work": {
-                    "type": "integer"
-                },
                 "message": {
                     "type": "string"
                 },
                 "pos-id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "status": {
                     "type": "integer"
@@ -478,9 +469,6 @@
                 },
                 "password": {
                     "type": "string"
-                },
-                "role": {
-                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

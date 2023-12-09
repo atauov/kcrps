@@ -16,57 +16,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/invoices": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get all user invoices",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "invoices"
-                ],
-                "summary": "Get All Invoices",
-                "operationId": "get-all-invoices",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -130,7 +79,60 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/invoices/:id": {
+        "/api/invoices/:pos-id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get all pos invoices",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoices"
+                ],
+                "summary": "Get All POS Invoices",
+                "operationId": "get-all-pos-invoices",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/invoices/:pos-id/:id": {
             "get": {
                 "security": [
                     {
@@ -147,7 +149,7 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Get Invoice By ID",
+                "summary": "Get Invoice By UUID",
                 "operationId": "get-invoice-by-id",
                 "responses": {
                     "200": {
@@ -183,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/invoices/cancel/:id": {
+        "/api/invoices/cancel/:pos-id/:id": {
             "put": {
                 "security": [
                     {
@@ -200,7 +202,7 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Cancel Invoice By ID",
+                "summary": "Cancel Invoice By UUID",
                 "operationId": "cancel-invoice-by-id",
                 "responses": {
                     "200": {
@@ -236,7 +238,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/invoices/refund/:id": {
+        "/api/invoices/refund/:pos-id/:id": {
             "put": {
                 "security": [
                     {
@@ -253,7 +255,7 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Refund Invoice By ID",
+                "summary": "Refund Invoice By UUID",
                 "operationId": "refund-invoice-by-id",
                 "responses": {
                     "200": {
@@ -436,7 +438,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "account",
-                "amount"
+                "amount",
+                "pos-id"
             ],
             "properties": {
                 "account": {
@@ -445,10 +448,10 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "message": {
+                    "type": "string"
+                },
+                "pos-id": {
                     "type": "string"
                 }
             }
@@ -467,6 +470,9 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
+                "role": {
+                    "type": "integer"
+                },
                 "username": {
                     "type": "string"
                 }
@@ -484,8 +490,8 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1",
-	Host:             "145.249.246.27",
+	Version:          "0.2",
+	Host:             "api.paylab.kz",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "kaspi custom API service",

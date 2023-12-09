@@ -57,7 +57,7 @@ func (r *InvoicePostgres) GetById(invoice kcrps.Invoice) (kcrps.Invoice, error) 
 
 	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status "+
 		"FROM %s WHERE uuid=$1 AND pos_id=$2 AND user_id=$3", invoicesTable)
-	err := r.db.Get(&result, query, invoice.ID, invoice.PosID, invoice.UserID)
+	err := r.db.Get(&result, query, invoice.UUID, invoice.PosID, invoice.UserID)
 
 	return result, err
 }
@@ -66,7 +66,7 @@ func (r *InvoicePostgres) SetInvoiceForCancel(invoice kcrps.Invoice) error {
 	var invoiceExist bool
 	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s WHERE uuid=$1 AND pos_id=$2 AND user_id=$3 AND status=$4)`,
 		invoicesTable)
-	if err := r.db.Get(&invoiceExist, query, invoice.ID, invoice.PosID, invoice.UserID, STATUS2); err != nil {
+	if err := r.db.Get(&invoiceExist, query, invoice.UUID, invoice.PosID, invoice.UserID, STATUS2); err != nil {
 		return err
 	}
 
@@ -75,7 +75,7 @@ func (r *InvoicePostgres) SetInvoiceForCancel(invoice kcrps.Invoice) error {
 	}
 
 	query = fmt.Sprintf("UPDATE %s SET status=$1 WHERE uuid=$2 AND pos_id=$3 AND user_id=$4", invoicesTable)
-	_, err := r.db.Exec(query, STATUS4, invoice.ID, invoice.PosID, invoice.UserID)
+	_, err := r.db.Exec(query, STATUS4, invoice.UUID, invoice.PosID, invoice.UserID)
 
 	return err
 }
@@ -84,7 +84,7 @@ func (r *InvoicePostgres) SetInvoiceForRefund(invoice kcrps.Invoice) error {
 	var invoiceExist bool
 	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s WHERE uuid = $1 AND pos_id=$2 AND user_id=$3 AND status=$4)`,
 		invoicesTable)
-	if err := r.db.Get(&invoiceExist, query, invoice.ID, invoice.PosID, invoice.UserID, STATUS9); err != nil {
+	if err := r.db.Get(&invoiceExist, query, invoice.UUID, invoice.PosID, invoice.UserID, STATUS9); err != nil {
 		return err
 	}
 
@@ -93,7 +93,7 @@ func (r *InvoicePostgres) SetInvoiceForRefund(invoice kcrps.Invoice) error {
 	}
 
 	query = fmt.Sprintf("UPDATE %s SET status=$1 WHERE uuid=$2 AND pos_id=$3 AND user_id=$4", invoicesTable)
-	_, err := r.db.Exec(query, STATUS10, invoice.ID, invoice.PosID, invoice.UserID)
+	_, err := r.db.Exec(query, STATUS10, invoice.UUID, invoice.PosID, invoice.UserID)
 
 	return err
 }

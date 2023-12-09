@@ -15,7 +15,7 @@ import (
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description create invoice
-// @ID invoice
+// @UUID invoice
 // @Accept  json
 // @Produce  json
 // @Param input body kcrps.Invoice true "invoice info"
@@ -64,14 +64,14 @@ type getAllInvoicesResponse struct {
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description get all user invoices
-// @ID get-all-invoices
+// @UUID get-all-invoices
 // @Accept  json
 // @Produce  json
 // @Success 200 {integer} getAllInvoicesResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices [get]
+// @Router /api/invoices/:pos-id [get]
 func (h *Handler) getAllInvoices(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -100,18 +100,18 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 	})
 }
 
-// @Summary Get Invoice By ID
+// @Summary Get Invoice By UUID
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description get invoice by id
-// @ID get-invoice-by-id
+// @UUID get-invoice-by-id
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} kcrps.Invoice
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices/:id [get]
+// @Router /api/invoices/:pos-id/:id [get]
 func (h *Handler) getInvoiceById(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -133,7 +133,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 	}
 
 	input := kcrps.Invoice{
-		ID:     invoiceId,
+		UUID:   invoiceId,
 		UserID: userId,
 		PosID:  posId,
 	}
@@ -146,18 +146,18 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 	c.JSON(http.StatusOK, invoice)
 }
 
-// @Summary Cancel Invoice By ID
+// @Summary Cancel Invoice By UUID
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description cancel invoice by id
-// @ID cancel-invoice-by-id
+// @UUID cancel-invoice-by-id
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} kcrps.Invoice
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices/cancel/:id [put]
+// @Router /api/invoices/cancel/:pos-id/:id [put]
 func (h *Handler) cancelInvoice(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -181,7 +181,7 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 	invoice := kcrps.Invoice{
 		UserID: userId,
 		PosID:  posId,
-		ID:     invoiceId,
+		UUID:   invoiceId,
 	}
 
 	if err = h.services.SetInvoiceForCancel(invoice); err != nil {
@@ -194,18 +194,18 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 	})
 }
 
-// @Summary Refund Invoice By ID
+// @Summary Refund Invoice By UUID
 // @Security ApiKeyAuth
 // @Tags invoices
 // @Description refund invoice by id
-// @ID refund-invoice-by-id
+// @UUID refund-invoice-by-id
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} kcrps.Invoice
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/invoices/refund/:id [put]
+// @Router /api/invoices/refund/:pos-id/:id [put]
 func (h *Handler) cancelPayment(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -229,7 +229,7 @@ func (h *Handler) cancelPayment(c *gin.Context) {
 	invoice := kcrps.Invoice{
 		UserID: userId,
 		PosID:  posId,
-		ID:     invoiceId,
+		UUID:   invoiceId,
 	}
 
 	if err = h.services.SetInvoiceForRefund(invoice); err != nil {
