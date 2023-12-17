@@ -6,6 +6,7 @@ import (
 	"github.com/atauov/kcrps/models/request"
 	"github.com/atauov/kcrps/models/response"
 	"github.com/jmoiron/sqlx"
+	"strconv"
 )
 
 type InvoicePostgres struct {
@@ -29,6 +30,8 @@ func (r *InvoicePostgres) Create(invoice request.Invoice) (int, error) {
 	if err = tx.QueryRow(query, invoice.PosID).Scan(&uuid); err != nil {
 		return 0, err
 	}
+
+	invoice.Message = strconv.Itoa(uuid) + " " + invoice.Message
 
 	query = fmt.Sprintf("INSERT INTO %s (created_at, account, amount, message, client_name, status, pos_id, uuid, user_id)"+
 		"VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8)", invoicesTable)
