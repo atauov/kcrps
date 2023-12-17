@@ -2,12 +2,13 @@ package handler
 
 import (
 	"errors"
+	"github.com/atauov/kcrps/models/request"
+	"github.com/atauov/kcrps/models/response"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 
-	"github.com/atauov/kcrps"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,8 +19,8 @@ import (
 // @UUID invoice
 // @Accept  json
 // @Produce  json
-// @Param input body kcrps.Invoice true "invoice info"
-// @Success 200 {integer} integer 1
+// @Param input body request.Invoice true "invoice info"
+// @Success 200 {object} idResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -30,7 +31,7 @@ func (h *Handler) createInvoice(c *gin.Context) {
 		return
 	}
 
-	var input kcrps.Invoice
+	var input request.Invoice
 
 	if err = c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -44,20 +45,20 @@ func (h *Handler) createInvoice(c *gin.Context) {
 
 	input.UserID = userId
 
-	id, err := h.services.Create(input)
+	uuId, err := h.services.Create(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+	c.JSON(http.StatusOK, idResponse{
+		Uuid: uuId,
 	})
 
 }
 
 type getAllInvoicesResponse struct {
-	Data []kcrps.Invoice `json:"data"`
+	Data []response.Invoice `json:"data"`
 }
 
 // @Summary Get All Invoices
@@ -67,7 +68,7 @@ type getAllInvoicesResponse struct {
 // @UUID get-all-invoices
 // @Accept  json
 // @Produce  json
-// @Success 200 {integer} getAllInvoicesResponse
+// @Success 200 {object} getAllInvoicesResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -85,7 +86,7 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 		return
 	}
 
-	input := kcrps.Invoice{
+	input := request.Invoice{
 		UserID: userId,
 		PosID:  posId,
 	}
@@ -107,7 +108,7 @@ func (h *Handler) getAllInvoices(c *gin.Context) {
 // @UUID get-invoice-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} kcrps.Invoice
+// @Success 200 {object} response.Invoice
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -132,7 +133,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 		return
 	}
 
-	input := kcrps.Invoice{
+	input := request.Invoice{
 		UUID:   invoiceId,
 		UserID: userId,
 		PosID:  posId,
@@ -153,7 +154,7 @@ func (h *Handler) getInvoiceById(c *gin.Context) {
 // @UUID cancel-invoice-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} kcrps.Invoice
+// @Success 200 {object} statusResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -178,7 +179,7 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 		return
 	}
 
-	invoice := kcrps.Invoice{
+	invoice := request.Invoice{
 		UserID: userId,
 		PosID:  posId,
 		UUID:   invoiceId,
@@ -201,7 +202,7 @@ func (h *Handler) cancelInvoice(c *gin.Context) {
 // @UUID refund-invoice-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} kcrps.Invoice
+// @Success 200 {object} statusResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -226,7 +227,7 @@ func (h *Handler) cancelPayment(c *gin.Context) {
 		return
 	}
 
-	invoice := kcrps.Invoice{
+	invoice := request.Invoice{
 		UserID: userId,
 		PosID:  posId,
 		UUID:   invoiceId,
@@ -242,7 +243,7 @@ func (h *Handler) cancelPayment(c *gin.Context) {
 	})
 }
 
-func validateInputInvoice(invoice *kcrps.Invoice) error {
+func validateInputInvoice(invoice *request.Invoice) error {
 	if invoice.Amount < 1 || invoice.Amount > 999999999 {
 		return errors.New("incorrect amount")
 	}

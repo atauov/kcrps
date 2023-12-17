@@ -5,6 +5,18 @@ definitions:
       message:
         type: string
     type: object
+  handler.getAllInvoicesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.Invoice'
+        type: array
+    type: object
+  handler.idResponse:
+    properties:
+      UUID:
+        type: integer
+    type: object
   handler.signInInput:
     properties:
       password:
@@ -15,21 +27,24 @@ definitions:
     - password
     - username
     type: object
-  kcrps.Invoice:
+  handler.statusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  request.Invoice:
     properties:
       account:
         type: string
       amount:
         type: integer
-      client-name:
+      clientName:
         type: string
-      created-at:
+      createdAt:
         type: string
-      id:
-        type: integer
       message:
         type: string
-      pos-id:
+      posID:
         type: string
       status:
         type: integer
@@ -40,20 +55,45 @@ definitions:
     required:
     - account
     - amount
-    - pos-id
+    - posID
     type: object
-  kcrps.User:
+  request.User:
     properties:
       company_name:
         type: string
       password:
         type: string
+      role:
+        type: integer
       username:
         type: string
     required:
     - company_name
     - password
     - username
+    type: object
+  response.Invoice:
+    properties:
+      account:
+        type: string
+      amount:
+        type: integer
+      client-name:
+        type: string
+      created-at:
+        type: string
+      message:
+        type: string
+      pos-id:
+        type: string
+      status:
+        type: integer
+      uuid:
+        type: integer
+    required:
+    - account
+    - amount
+    - pos-id
     type: object
 host: api.paylab.kz
 info:
@@ -67,21 +107,20 @@ paths:
       consumes:
       - application/json
       description: create invoice
-      operationId: invoice
       parameters:
       - description: invoice info
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/kcrps.Invoice'
+          $ref: '#/definitions/request.Invoice'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: integer
+            $ref: '#/definitions/handler.idResponse'
         "400":
           description: Bad Request
           schema:
@@ -108,14 +147,13 @@ paths:
       consumes:
       - application/json
       description: get all user invoices
-      operationId: get-all-invoices
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: integer
+            $ref: '#/definitions/handler.getAllInvoicesResponse'
         "400":
           description: Bad Request
           schema:
@@ -142,14 +180,13 @@ paths:
       consumes:
       - application/json
       description: get invoice by id
-      operationId: get-invoice-by-id
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/kcrps.Invoice'
+            $ref: '#/definitions/response.Invoice'
         "400":
           description: Bad Request
           schema:
@@ -168,7 +205,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get Invoice By ID
+      summary: Get Invoice By UUID
       tags:
       - invoices
   /api/invoices/cancel/:pos-id/:id:
@@ -176,14 +213,13 @@ paths:
       consumes:
       - application/json
       description: cancel invoice by id
-      operationId: cancel-invoice-by-id
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/kcrps.Invoice'
+            $ref: '#/definitions/handler.statusResponse'
         "400":
           description: Bad Request
           schema:
@@ -202,7 +238,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Cancel Invoice By ID
+      summary: Cancel Invoice By UUID
       tags:
       - invoices
   /api/invoices/refund/:pos-id/:id:
@@ -210,14 +246,13 @@ paths:
       consumes:
       - application/json
       description: refund invoice by id
-      operationId: refund-invoice-by-id
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/kcrps.Invoice'
+            $ref: '#/definitions/handler.statusResponse'
         "400":
           description: Bad Request
           schema:
@@ -236,7 +271,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Refund Invoice By ID
+      summary: Refund Invoice By UUID
       tags:
       - invoices
   /auth/sign-in:
@@ -244,7 +279,6 @@ paths:
       consumes:
       - application/json
       description: login
-      operationId: login
       parameters:
       - description: credentials
         in: body
@@ -283,14 +317,13 @@ paths:
       consumes:
       - application/json
       description: create account
-      operationId: create-account
       parameters:
       - description: account info
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/kcrps.User'
+          $ref: '#/definitions/request.User'
       produces:
       - application/json
       responses:
@@ -320,6 +353,6 @@ paths:
 securityDefinitions:
   ApiKeyAuth:
     in: header
-    name: X-API-KEY
+    name: Authorization
     type: apiKey
 swagger: "2.0"

@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"github.com/atauov/kcrps/models/request"
 	"github.com/sirupsen/logrus"
 	"net/http"
 
-	"github.com/atauov/kcrps"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ import (
 // @UUID create-account
 // @Accept  json
 // @Produce  json
-// @Param input body kcrps.User true "account info"
+// @Param input body request.User true "account info"
 // @Success 200 {integer} integer 1
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
@@ -22,7 +22,7 @@ import (
 // @Failure default {object} errorResponse
 // @Router /auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
-	var input kcrps.User
+	var input request.User
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())

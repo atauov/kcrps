@@ -33,7 +33,6 @@ const docTemplate = `{
                     "invoices"
                 ],
                 "summary": "Create invoice",
-                "operationId": "invoice",
                 "parameters": [
                     {
                         "description": "invoice info",
@@ -41,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/request.Invoice"
                         }
                     }
                 ],
@@ -49,7 +48,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/handler.idResponse"
                         }
                     },
                     "400": {
@@ -86,7 +85,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get all pos invoices",
+                "description": "get all user invoices",
                 "consumes": [
                     "application/json"
                 ],
@@ -96,13 +95,12 @@ const docTemplate = `{
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Get All POS Invoices",
-                "operationId": "get-all-pos-invoices",
+                "summary": "Get All Invoices",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/handler.getAllInvoicesResponse"
                         }
                     },
                     "400": {
@@ -150,12 +148,11 @@ const docTemplate = `{
                     "invoices"
                 ],
                 "summary": "Get Invoice By UUID",
-                "operationId": "get-invoice-by-id",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/response.Invoice"
                         }
                     },
                     "400": {
@@ -203,12 +200,11 @@ const docTemplate = `{
                     "invoices"
                 ],
                 "summary": "Cancel Invoice By UUID",
-                "operationId": "cancel-invoice-by-id",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/handler.statusResponse"
                         }
                     },
                     "400": {
@@ -256,12 +252,11 @@ const docTemplate = `{
                     "invoices"
                 ],
                 "summary": "Refund Invoice By UUID",
-                "operationId": "refund-invoice-by-id",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/handler.statusResponse"
                         }
                     },
                     "400": {
@@ -304,7 +299,6 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "SignIn",
-                "operationId": "login",
                 "parameters": [
                     {
                         "description": "credentials",
@@ -363,7 +357,6 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "SignUp",
-                "operationId": "create-account",
                 "parameters": [
                     {
                         "description": "account info",
@@ -371,7 +364,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kcrps.User"
+                            "$ref": "#/definitions/request.User"
                         }
                     }
                 ],
@@ -419,6 +412,25 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.getAllInvoicesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Invoice"
+                    }
+                }
+            }
+        },
+        "handler.idResponse": {
+            "type": "object",
+            "properties": {
+                "UUID": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.signInInput": {
             "type": "object",
             "required": [
@@ -434,12 +446,20 @@ const docTemplate = `{
                 }
             }
         },
-        "kcrps.Invoice": {
+        "handler.statusResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.Invoice": {
             "type": "object",
             "required": [
                 "account",
                 "amount",
-                "pos-id"
+                "posID"
             ],
             "properties": {
                 "account": {
@@ -448,15 +468,30 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
+                "clientName": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
                 "message": {
                     "type": "string"
                 },
-                "pos-id": {
+                "posID": {
                     "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "userID": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "integer"
                 }
             }
         },
-        "kcrps.User": {
+        "request.User": {
             "type": "object",
             "required": [
                 "company_name",
@@ -475,6 +510,40 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "response.Invoice": {
+            "type": "object",
+            "required": [
+                "account",
+                "amount",
+                "pos-id"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
+                },
+                "client-name": {
+                    "type": "string"
+                },
+                "created-at": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pos-id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "integer"
                 }
             }
         }

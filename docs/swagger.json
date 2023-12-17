@@ -27,7 +27,6 @@
                     "invoices"
                 ],
                 "summary": "Create invoice",
-                "operationId": "invoice",
                 "parameters": [
                     {
                         "description": "invoice info",
@@ -35,7 +34,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/request.Invoice"
                         }
                     }
                 ],
@@ -43,7 +42,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/handler.idResponse"
                         }
                     },
                     "400": {
@@ -91,12 +90,11 @@
                     "invoices"
                 ],
                 "summary": "Get All Invoices",
-                "operationId": "get-all-invoices",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/handler.getAllInvoicesResponse"
                         }
                     },
                     "400": {
@@ -143,13 +141,12 @@
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Get Invoice By ID",
-                "operationId": "get-invoice-by-id",
+                "summary": "Get Invoice By UUID",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/response.Invoice"
                         }
                     },
                     "400": {
@@ -196,13 +193,12 @@
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Cancel Invoice By ID",
-                "operationId": "cancel-invoice-by-id",
+                "summary": "Cancel Invoice By UUID",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/handler.statusResponse"
                         }
                     },
                     "400": {
@@ -249,13 +245,12 @@
                 "tags": [
                     "invoices"
                 ],
-                "summary": "Refund Invoice By ID",
-                "operationId": "refund-invoice-by-id",
+                "summary": "Refund Invoice By UUID",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kcrps.Invoice"
+                            "$ref": "#/definitions/handler.statusResponse"
                         }
                     },
                     "400": {
@@ -298,7 +293,6 @@
                     "auth"
                 ],
                 "summary": "SignIn",
-                "operationId": "login",
                 "parameters": [
                     {
                         "description": "credentials",
@@ -357,7 +351,6 @@
                     "auth"
                 ],
                 "summary": "SignUp",
-                "operationId": "create-account",
                 "parameters": [
                     {
                         "description": "account info",
@@ -365,7 +358,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kcrps.User"
+                            "$ref": "#/definitions/request.User"
                         }
                     }
                 ],
@@ -413,6 +406,25 @@
                 }
             }
         },
+        "handler.getAllInvoicesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Invoice"
+                    }
+                }
+            }
+        },
+        "handler.idResponse": {
+            "type": "object",
+            "properties": {
+                "UUID": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.signInInput": {
             "type": "object",
             "required": [
@@ -428,7 +440,74 @@
                 }
             }
         },
-        "kcrps.Invoice": {
+        "handler.statusResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.Invoice": {
+            "type": "object",
+            "required": [
+                "account",
+                "amount",
+                "posID"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
+                },
+                "clientName": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "posID": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "userID": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.User": {
+            "type": "object",
+            "required": [
+                "company_name",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "company_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Invoice": {
             "type": "object",
             "required": [
                 "account",
@@ -441,6 +520,12 @@
                 },
                 "amount": {
                     "type": "integer"
+                },
+                "client-name": {
+                    "type": "string"
+                },
+                "created-at": {
+                    "type": "string"
                 },
                 "message": {
                     "type": "string"
@@ -455,31 +540,12 @@
                     "type": "integer"
                 }
             }
-        },
-        "kcrps.User": {
-            "type": "object",
-            "required": [
-                "company_name",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "company_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
         }
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "X-API-KEY",
+            "name": "Authorization",
             "in": "header"
         }
     }

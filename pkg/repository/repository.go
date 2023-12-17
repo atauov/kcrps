@@ -1,22 +1,23 @@
 package repository
 
 import (
-	"github.com/atauov/kcrps"
+	"github.com/atauov/kcrps/models/request"
+	"github.com/atauov/kcrps/models/response"
 	"github.com/jmoiron/sqlx"
 )
 
 type Authorization interface {
-	CreateUser(user kcrps.User) (int, error)
-	GetUser(username, password string) (kcrps.User, error)
+	CreateUser(user request.User) (int, error)
+	GetUser(username, password string) (request.User, error)
 	GetUserIdByApiKey(api string) (int, error)
 }
 
 type Invoice interface {
-	Create(invoice kcrps.Invoice) (int, error)
-	GetAll(invoice kcrps.Invoice) ([]kcrps.Invoice, error)
-	GetById(invoice kcrps.Invoice) (kcrps.Invoice, error)
-	SetInvoiceForCancel(invoice kcrps.Invoice) error
-	SetInvoiceForRefund(invoice kcrps.Invoice) error
+	Create(invoice request.Invoice) (int, error)
+	GetAll(invoice request.Invoice) ([]response.Invoice, error)
+	GetById(invoice request.Invoice) (response.Invoice, error)
+	SetInvoiceForCancel(invoice request.Invoice) error
+	SetInvoiceForRefund(invoice request.Invoice) error
 }
 
 type Repository struct {

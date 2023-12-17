@@ -9,6 +9,10 @@ type errorResponse struct {
 	Message string `json:"message"`
 }
 
+type idResponse struct {
+	Uuid int `json:"UUID"`
+}
+
 type statusResponse struct {
 	Status string `json:"status"`
 }

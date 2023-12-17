@@ -3,7 +3,8 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/atauov/kcrps"
+	"github.com/atauov/kcrps/models/request"
+	"github.com/atauov/kcrps/models/response"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -15,7 +16,7 @@ func NewInvoicePostgres(db *sqlx.DB) *InvoicePostgres {
 	return &InvoicePostgres{db: db}
 }
 
-func (r *InvoicePostgres) Create(invoice kcrps.Invoice) (int, error) {
+func (r *InvoicePostgres) Create(invoice request.Invoice) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -43,26 +44,26 @@ func (r *InvoicePostgres) Create(invoice kcrps.Invoice) (int, error) {
 	return uuid, err
 }
 
-func (r *InvoicePostgres) GetAll(invoice kcrps.Invoice) ([]kcrps.Invoice, error) {
-	var result []kcrps.Invoice
+func (r *InvoicePostgres) GetAll(invoice request.Invoice) ([]response.Invoice, error) {
+	var result []response.Invoice
 
-	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status FROM %s "+
+	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status, pos_id FROM %s "+
 		"WHERE pos_id=$1 AND user_id=$2 ORDER BY uuid DESC", invoicesTable)
 	err := r.db.Select(&result, query, invoice.PosID, invoice.UserID)
 	return result, err
 }
 
-func (r *InvoicePostgres) GetById(invoice kcrps.Invoice) (kcrps.Invoice, error) {
-	var result kcrps.Invoice
+func (r *InvoicePostgres) GetById(invoice request.Invoice) (response.Invoice, error) {
+	var result response.Invoice
 
-	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status "+
+	query := fmt.Sprintf("SELECT uuid, created_at, account, amount, client_name, message, status, pos_id "+
 		"FROM %s WHERE uuid=$1 AND pos_id=$2 AND user_id=$3", invoicesTable)
 	err := r.db.Get(&result, query, invoice.UUID, invoice.PosID, invoice.UserID)
 
 	return result, err
 }
 
-func (r *InvoicePostgres) SetInvoiceForCancel(invoice kcrps.Invoice) error {
+func (r *InvoicePostgres) SetInvoiceForCancel(invoice request.Invoice) error {
 	var invoiceExist bool
 	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s WHERE uuid=$1 AND pos_id=$2 AND user_id=$3 AND status=$4)`,
 		invoicesTable)
@@ -80,7 +81,7 @@ func (r *InvoicePostgres) SetInvoiceForCancel(invoice kcrps.Invoice) error {
 	return err
 }
 
-func (r *InvoicePostgres) SetInvoiceForRefund(invoice kcrps.Invoice) error {
+func (r *InvoicePostgres) SetInvoiceForRefund(invoice request.Invoice) error {
 	var invoiceExist bool
 	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s WHERE uuid = $1 AND pos_id=$2 AND user_id=$3 AND status=$4)`,
 		invoicesTable)
