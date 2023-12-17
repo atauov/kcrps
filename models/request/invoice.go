@@ -7,7 +7,7 @@ import (
 
 type Invoice struct {
 	UUID       int       `db:"uuid"`
-	PosID      uuid.UUID `db:"pos_id" binding:"required"`
+	PosID      uuid.UUID `json:"pos-id" db:"pos_id" binding:"required"`
 	UserID     int
 	CreatedAt  time.Time `db:"created_at"`
 	Account    string    `json:"account" db:"account" binding:"required"`

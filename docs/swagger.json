@@ -453,7 +453,7 @@
             "required": [
                 "account",
                 "amount",
-                "posID"
+                "pos-id"
             ],
             "properties": {
                 "account": {
@@ -471,7 +471,7 @@
                 "message": {
                     "type": "string"
                 },
-                "posID": {
+                "pos-id": {
                     "type": "string"
                 },
                 "status": {

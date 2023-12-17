@@ -44,7 +44,7 @@ definitions:
         type: string
       message:
         type: string
-      posID:
+      pos-id:
         type: string
       status:
         type: integer
@@ -55,7 +55,7 @@ definitions:
     required:
     - account
     - amount
-    - posID
+    - pos-id
     type: object
   request.User:
     properties:

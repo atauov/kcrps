@@ -459,7 +459,7 @@ const docTemplate = `{
             "required": [
                 "account",
                 "amount",
-                "posID"
+                "pos-id"
             ],
             "properties": {
                 "account": {
@@ -477,7 +477,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "posID": {
+                "pos-id": {
                     "type": "string"
                 },
                 "status": {
