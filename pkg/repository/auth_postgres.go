@@ -33,3 +33,11 @@ func (r *AuthPostgres) GetUser(username, password string) (kcrps.User, error) {
 
 	return user, err
 }
+
+func (r *AuthPostgres) GetUserIdByApiKey(api string) (int, error) {
+	var userId int
+	query := fmt.Sprintf("SELECT id FROM %s WHERE api_key=$1", usersTable)
+	err := r.db.Get(&userId, query, api)
+
+	return userId, err
+}

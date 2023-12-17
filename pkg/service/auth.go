@@ -78,3 +78,7 @@ func generatePasswordHash(password string) string {
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
+
+func (s *AuthService) GetUserIdByApiKey(api string) (int, error) {
+	return s.repo.GetUserIdByApiKey(api)
+}

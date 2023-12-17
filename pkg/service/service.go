@@ -9,6 +9,7 @@ type Authorization interface {
 	CreateUser(user kcrps.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
+	GetUserIdByApiKey(api string) (int, error)
 }
 
 type Invoice interface {

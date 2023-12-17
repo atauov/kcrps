@@ -8,6 +8,7 @@ import (
 type Authorization interface {
 	CreateUser(user kcrps.User) (int, error)
 	GetUser(username, password string) (kcrps.User, error)
+	GetUserIdByApiKey(api string) (int, error)
 }
 
 type Invoice interface {

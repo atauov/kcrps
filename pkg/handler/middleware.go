@@ -10,27 +10,44 @@ import (
 const (
 	authorizationHeader = "Authorization"
 	userCtx             = "userId"
+	apiKeyHeader        = "x-api-key"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
-	header := c.GetHeader(authorizationHeader)
-	if header == "" {
+	headerXkey := c.GetHeader(apiKeyHeader)
+	headerBearer := c.GetHeader(authorizationHeader)
+
+	if headerXkey != "" {
+		userId, err := h.services.Authorization.GetUserIdByApiKey(headerXkey)
+		if err != nil {
+			newErrorResponse(c, http.StatusUnauthorized, err.Error())
+			return
+		}
+		c.Set(userCtx, userId)
+
+		return
+
+	} else if headerBearer != "" {
+		headerParts := strings.Split(headerBearer, " ")
+		if len(headerParts) != 2 {
+			newErrorResponse(c, http.StatusUnauthorized, "invalid auth headerBearer")
+			return
+		}
+
+		userId, err := h.services.Authorization.ParseToken(headerParts[1])
+		if err != nil {
+			newErrorResponse(c, http.StatusUnauthorized, err.Error())
+			return
+		}
+		c.Set(userCtx, userId)
+
+		return
+
+	} else {
 		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
 		return
 	}
-	headerParts := strings.Split(header, " ")
-	if len(headerParts) != 2 {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
 
-	userId, err := h.services.Authorization.ParseToken(headerParts[1])
-	if err != nil {
-		newErrorResponse(c, http.StatusUnauthorized, err.Error())
-		return
-	}
-
-	c.Set(userCtx, userId)
 }
 
 func getUserId(c *gin.Context) (int, error) {
