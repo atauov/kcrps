@@ -26,7 +26,7 @@ import (
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
+// @name X-API-KEY
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
