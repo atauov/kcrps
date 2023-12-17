@@ -10,7 +10,7 @@ import (
 const (
 	authorizationHeader = "Authorization"
 	userCtx             = "userId"
-	apiKeyHeader        = "x-api-key"
+	apiKeyHeader        = "X-API-KEY"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {

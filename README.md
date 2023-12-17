@@ -7,6 +7,7 @@ Changelog:
     new statuses
     daemon is separated
     webserver is separated
+    auth with x-api-key
 
 Golang
 JWT
